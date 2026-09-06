@@ -233,12 +233,13 @@ Hệ thống xác định rõ 3 điểm chạm (Touchpoints) thực sự cần A
 
 ---
 
-## 8. Thiết kế Prompt và Luồng gọi AI sơ bộ
-- **Nguyên tắc thiết kế Prompt:** Tách biệt hoàn toàn code logic và nội dung Prompt; sử dụng placeholder `{{biến}}` để inject dữ liệu từ database.
-- **Ràng buộc an toàn:**
-  - Chỉ tư vấn sản phẩm có trong danh sách được truyền vào (Grounding).
-  - Nghiêm cấm gợi ý sản phẩm có tồn kho = 0.
-  - Tự động che giấu số điện thoại khách hàng bằng Regex Masking.
+## 8. Thiết kế Wireframe giao diện người dùng (do AI hỗ trợ phác thảo)
+Dưới sự hỗ trợ của Chuyên gia UI/UX (AI Persona), nhóm đã hoàn thiện bản vẽ Wireframe bố cục cho 3 màn hình nghiệp vụ trọng tâm:
+1. **Màn hình Bán hàng POS tại quầy:** Phân chia 2 cột - Tìm kiếm/chọn nhanh sản phẩm có tồn kho bên trái và Hóa đơn tính tiền tự động bên phải.
+2. **Màn hình Quản lý Sản phẩm & Cảnh báo tồn kho:** Bảng dữ liệu có bộ lọc danh mục, ô tìm kiếm và huy hiệu màu cảnh báo sản phẩm sắp hết hàng (`stock <= 5`).
+3. **Màn hình Dashboard phân tích kinh doanh:** Thẻ số liệu tổng quan, biểu đồ cột doanh thu 30 ngày và Widget trợ lý AI nhận định xu hướng.
+
+*(Chi tiết bản vẽ bố cục ASCII Wireframe và prompt tương tác được lưu trữ đầy đủ tại [TONG_HOP_PROMPT_AI_PHAT_TRIEN_DU_AN.md](./TONG_HOP_PROMPT_AI_PHAT_TRIEN_DU_AN.md)).*
 
 ---
 

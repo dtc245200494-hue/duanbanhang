@@ -97,3 +97,4 @@ Bộ tài liệu chi tiết phục vụ các bài đánh giá học phần đặ
 - [Báo cáo TX2 - Lập trình hệ thống quản lý](./tailieu/BAO_CAO_TX2_LAP_TRINH_HE_THONG.md)
 - [Báo cáo TX3 - Tích hợp & Tối ưu hóa AI](./tailieu/BAO_CAO_TX3_TICH_HOP_AI.md)
 - [Báo cáo KTHP & Kịch bản thuyết trình Demo](./tailieu/BAO_CAO_KTHP_VA_KICH_BAN_DEMO.md)
+- [Tổng hợp Prompt & Minh chứng sử dụng AI (3 Giai đoạn)](./tailieu/TONG_HOP_PROMPT_AI_PHAT_TRIEN_DU_AN.md)

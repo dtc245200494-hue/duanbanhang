@@ -18,6 +18,7 @@
 | 3 | **Báo cáo TX2** | **Lập trình hệ thống quản lý:** Cấu trúc Backend FastAPI, SQLite + SQLAlchemy ORM, Frontend React 18, Nghiệp vụ POS, Quản lý kho, Xuất báo cáo. | [BAO_CAO_TX2_LAP_TRINH_HE_THONG.md](./BAO_CAO_TX2_LAP_TRINH_HE_THONG.md) |
 | 4 | **Báo cáo TX3** | **Tích hợp & Tối ưu hóa AI:** Trợ lý tư vấn sản phẩm, Phân tích kinh doanh, Prompt Engineering & Quản lý phiên bản, Che giấu dữ liệu (Data Masking), Rate limit & Error handling. | [BAO_CAO_TX3_TICH_HOP_AI.md](./BAO_CAO_TX3_TICH_HOP_AI.md) |
 | 5 | **Báo cáo KTHP** | **Tổng kết dự án & Kịch bản Demo:** Kiến trúc tổng thể, Đánh giá kết quả đạt được, Kịch bản thuyết trình và Demo chi tiết 7 bước khi chấm thi. | [BAO_CAO_KTHP_VA_KICH_BAN_DEMO.md](./BAO_CAO_KTHP_VA_KICH_BAN_DEMO.md) |
+| 6 | **Tổng hợp Prompt AI (3 Giai đoạn)** | **Nhật ký minh chứng Prompting chuyên sâu:** Ứng dụng mô hình phân vai 5 Chuyên gia AI (BA, Architect, UI/UX, Dev, QA) sinh ERD, Wireframe, code CRUD, debug lệch kho và đối chiếu 3 phiên bản Prompt. | [TONG_HOP_PROMPT_AI_PHAT_TRIEN_DU_AN.md](./TONG_HOP_PROMPT_AI_PHAT_TRIEN_DU_AN.md) |
 
 ---
 
