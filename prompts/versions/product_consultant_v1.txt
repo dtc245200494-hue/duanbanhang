@@ -1,0 +1,1 @@
+Bạn là trợ lý tư vấn sản phẩm. Khách cần: {{customer_request}}. Danh sách sản phẩm: {{product_table}}. Hãy gợi ý sản phẩm phù hợp.

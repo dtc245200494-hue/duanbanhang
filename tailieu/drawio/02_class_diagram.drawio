@@ -1,0 +1,61 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0">
+  <diagram id="class-diag" name="Domain Class Diagram">
+    <mxGraphModel dx="1373" dy="1576" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="class_user" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=40;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;swimlaneFillColor=#1E3A8A;swimlaneLine=1;align=center;" value="User&#xa;" vertex="1">
+          <mxGeometry height="210" width="220" x="60" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="AQAe016Xyzd5O_UiykS1-3" parent="class_user" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;text-wrap-mode: nowrap;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;color: rgb(255, 253, 252);&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;div&gt;&lt;span style=&quot;white-space: nowrap; color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;+ id: int [PK]&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;text-align: center; white-space: nowrap;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;+ username: str [UK]&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;span style=&quot;text-align: center; white-space: nowrap;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;+ password_hash: str&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;span style=&quot;text-align: center; white-space: nowrap;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;+ full_name: str&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;span style=&quot;text-align: center; white-space: nowrap;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;+ role: str&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;span style=&quot;text-align: center; white-space: nowrap;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;+ is_active: bool&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;span style=&quot;text-align: center; white-space: nowrap;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;+ created_at: datetime&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;span style=&quot;text-align: center; white-space: nowrap;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;-----------------------------------&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;span style=&quot;text-align: center; white-space: nowrap;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;+ verify_password(pwd): bool&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;span style=&quot;text-align: center; white-space: nowrap;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(255, 253, 252), rgb(21, 19, 19)); background-color: transparent;&quot;&gt;+ is_admin(): bool&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="170" width="220" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="class_category" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#FFFFFF;strokeColor=#1E3A8A;strokeWidth=2;fontColor=#0F172A;swimlaneFillColor=#1E3A8A;swimlaneLine=1;fontColor=#FFFFFF;align=center;" value="&lt;b&gt;«entity» Category&lt;/b&gt;&#xa;-----------------------------------&#xa;+ id: int [PK]&#xa;+ name: str [UK]&#xa;+ description: str&#xa;-----------------------------------&#xa;+ get_active_products(): list" vertex="1">
+          <mxGeometry height="140" width="200" x="355" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="class_product" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#FFFFFF;strokeColor=#1E3A8A;strokeWidth=2;fontColor=#0F172A;swimlaneFillColor=#1E3A8A;swimlaneLine=1;fontColor=#FFFFFF;align=center;" value="&lt;b&gt;«entity» Product&lt;/b&gt;&#xa;-----------------------------------&#xa;+ id: int [PK]&#xa;+ code: str [UK]&#xa;+ name: str&#xa;+ category_id: int [FK]&#xa;+ import_price: float&#xa;+ sell_price: float&#xa;+ stock: int&#xa;+ status: str&#xa;+ description: str&#xa;-----------------------------------&#xa;+ check_stock(qty): bool&#xa;+ update_stock(qty): void" vertex="1">
+          <mxGeometry height="250" width="220" x="640" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="class_ai" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#F0FDF4;strokeColor=#059669;strokeWidth=2;fontColor=#065F46;swimlaneFillColor=#059669;swimlaneLine=1;fontColor=#FFFFFF;align=center;" value="&lt;b&gt;«service» AIService&lt;/b&gt;&#xa;-----------------------------------&#xa;- api_key: str&#xa;- model: str&#xa;-----------------------------------&#xa;+ consult_products(q): str&#xa;+ analyze_revenue(): str&#xa;- _mask_sensitive(d): dict" vertex="1">
+          <mxGeometry height="170" width="200" x="930" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="class_receipt" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#FFFFFF;strokeColor=#1E3A8A;strokeWidth=2;fontColor=#0F172A;swimlaneFillColor=#1E3A8A;swimlaneLine=1;fontColor=#FFFFFF;align=center;" value="&lt;b&gt;«entity» PurchaseReceipt&lt;/b&gt;&#xa;-----------------------------------&#xa;+ id: int [PK]&#xa;+ code: str [UK]&#xa;+ supplier: str&#xa;+ user_id: int [FK]&#xa;+ total_amount: float&#xa;+ status: str&#xa;+ created_at: datetime&#xa;-----------------------------------&#xa;+ confirm_receipt(): void" vertex="1">
+          <mxGeometry height="200" width="220" x="60" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="class_customer" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#FFFFFF;strokeColor=#1E3A8A;strokeWidth=2;fontColor=#0F172A;swimlaneFillColor=#1E3A8A;swimlaneLine=1;fontColor=#FFFFFF;align=center;" value="&lt;b&gt;«entity» Customer&lt;/b&gt;&#xa;-----------------------------------&#xa;+ id: int [PK]&#xa;+ name: str&#xa;+ phone: str [UK]&#xa;+ email: str&#xa;+ address: str&#xa;+ customer_group: str&#xa;-----------------------------------&#xa;+ get_order_history(): list" vertex="1">
+          <mxGeometry height="190" width="210" x="350" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="class_order" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#FFFFFF;strokeColor=#1E3A8A;strokeWidth=2;fontColor=#0F172A;swimlaneFillColor=#1E3A8A;swimlaneLine=1;fontColor=#FFFFFF;align=center;" value="&lt;b&gt;«entity» Order&lt;/b&gt;&#xa;-----------------------------------&#xa;+ id: int [PK]&#xa;+ code: str [UK]&#xa;+ customer_id: int [FK]&#xa;+ user_id: int [FK]&#xa;+ total_amount: float&#xa;+ discount: float&#xa;+ final_amount: float&#xa;+ payment_method: str&#xa;+ status: str&#xa;+ created_at: datetime&#xa;-----------------------------------&#xa;+ calculate_total(): float&#xa;+ cancel_and_refund(): bool" vertex="1">
+          <mxGeometry height="180" width="210" x="630" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="class_detail" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#FFFFFF;strokeColor=#1E3A8A;strokeWidth=2;fontColor=#0F172A;swimlaneFillColor=#1E3A8A;swimlaneLine=1;fontColor=#FFFFFF;align=center;" value="&lt;b&gt;«entity» OrderDetail&lt;/b&gt;&#xa;-----------------------------------&#xa;+ id: int [PK]&#xa;+ order_id: int [FK]&#xa;+ product_id: int [FK]&#xa;+ quantity: int&#xa;+ price: float&#xa;+ total: float&#xa;-----------------------------------&#xa;+ subtotal(): float" vertex="1">
+          <mxGeometry height="190" width="200" x="910" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_cat_prod" edge="1" parent="1" source="class_category" style="endArrow=none;html=1;strokeColor=#2563EB;strokeWidth=2;fontColor=#1D4ED8;fontSize=11;" target="class_product" value="chứa&#xa;1             0..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_order_detail" edge="1" parent="1" source="class_order" style="endArrow=none;startArrow=diamond;startFill=1;html=1;strokeColor=#1E3A8A;strokeWidth=2;fontColor=#1E3A8A;fontSize=11;" target="class_detail" value="«composition»&#xa;1             1..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_prod_detail" edge="1" parent="1" source="class_product" style="endArrow=classic;html=1;strokeColor=#2563EB;strokeWidth=2;fontColor=#1D4ED8;fontSize=11;" target="class_detail" value="1&#xa;&#xa;0..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_cust_order" edge="1" parent="1" source="class_customer" style="endArrow=classic;html=1;strokeColor=#2563EB;strokeWidth=2;fontColor=#1D4ED8;fontSize=11;" target="class_order" value="đặt mua&#xa;0..1             0..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_user_order" edge="1" parent="1" source="class_user" style="endArrow=classic;html=1;strokeColor=#D97706;strokeWidth=2;fontColor=#B45309;fontSize=11;" target="class_order" value="lập đơn hàng&#xa;1             0..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_user_receipt" edge="1" parent="1" source="class_user" style="endArrow=classic;html=1;strokeColor=#D97706;strokeWidth=2;fontColor=#B45309;fontSize=11;" target="class_receipt" value="nhập kho&#xa;1&#xa;&#xa;0..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_ai_prod" edge="1" parent="1" source="class_ai" style="endArrow=open;dashed=1;html=1;strokeColor=#059669;strokeWidth=2;fontColor=#059669;fontSize=11;" target="class_product" value="«use»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_ai_order" edge="1" parent="1" source="class_ai" style="endArrow=open;dashed=1;html=1;strokeColor=#059669;strokeWidth=2;fontColor=#059669;fontSize=11;" target="class_order" value="«analyze»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

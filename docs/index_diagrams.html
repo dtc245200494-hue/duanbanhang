@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hệ thống Sơ đồ Thiết kế Kỹ thuật (Interactive HTML Viewers)</title>
+<style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 15px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #f1f5f9;
+  color: #0f172a;
+  padding: 30px 20px;
+}
+@media (prefers-color-scheme: dark) {
+  body { background: #0f172a; color: #f1f5f9; }
+}
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+h1 {
+  color: #1e3a8a;
+  font-size: 26px;
+  margin: 0 0 8px;
+}
+@media (prefers-color-scheme: dark) {
+  h1 { color: #60a5fa; }
+}
+.sub {
+  color: #64748b;
+  font-size: 15px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+  border-color: #3b82f6;
+}
+@media (prefers-color-scheme: dark) {
+  .card { background: #1e293b; border-color: #334155; }
+  .card:hover { border-color: #60a5fa; }
+}
+.tag {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+}
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #1e293b;
+}
+@media (prefers-color-scheme: dark) {
+  .title { color: #f8fafc; }
+}
+.desc {
+  font-size: 13px;
+  color: #64748b;
+  flex-grow: 1;
+}
+.btn {
+  margin-top: 15px;
+  padding: 8px 14px;
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>📐 Hệ thống Sơ đồ Kỹ thuật Tương tác (Interactive HTML)</h1>
+    <div class="sub">Tất cả sơ đồ chuẩn vector SVG sắc nét, tích hợp tính năng Kéo thả (Pan), Thu phóng (Zoom) và Tìm kiếm (Search)</div>
+  </header>
+  <div class="grid">
+    <a href="images/01_use_case.html" class="card" target="_blank">
+      <div class="tag">UML Use Case</div>
+      <div class="title">1. Sơ đồ Use Case Tổng quát</div>
+      <div class="desc">Phân quyền 2 Actor: Admin &amp; Owner, ranh giới hệ thống và 10 chức năng cốt lõi.</div>
+      <div class="btn">Mở Trình xem HTML →</div>
+    </a>
+
+    <a href="images/02_class_diagram.html" class="card" target="_blank">
+      <div class="tag">UML Class</div>
+      <div class="title">2. Sơ đồ Lớp Lĩnh vực</div>
+      <div class="desc">7 Entities &amp; AIService với đầy đủ Composition (◆), Multiplicity (1..*, 0..*) và Directed Association.</div>
+      <div class="btn">Mở Trình xem HTML →</div>
+    </a>
+
+    <a href="images/03_erd.html" class="card" target="_blank">
+      <div class="tag">Database ERD</div>
+      <div class="title">3. Sơ đồ Quan hệ Thực thể CSDL</div>
+      <div class="desc">7 bảng CSDL thực tế trong SQLite: users, categories, products, orders, order_details...</div>
+      <div class="btn">Mở Trình xem HTML →</div>
+    </a>
+
+    <a href="images/04_architecture.html" class="card" target="_blank">
+      <div class="tag">Architecture</div>
+      <div class="title">4. Sơ đồ Kiến trúc 3 Tầng</div>
+      <div class="desc">Client (React 18 SPA) ↔ Backend (FastAPI Python) ↔ SQLite DB &amp; OpenAI Cloud API.</div>
+      <div class="btn">Mở Trình xem HTML →</div>
+    </a>
+
+    <a href="images/05_seq_pos.html" class="card" target="_blank">
+      <div class="tag">Activity Flow</div>
+      <div class="title">5. Sơ đồ Hoạt động Bán hàng POS</div>
+      <div class="desc">Luồng quét barcode, kiểm tra tồn kho (stock >= qty), tự động trừ kho và in bill.</div>
+      <div class="btn">Mở Trình xem HTML →</div>
+    </a>
+
+    <a href="images/06_seq_ai.html" class="card" target="_blank">
+      <div class="tag">Activity Flow</div>
+      <div class="title">6. Sơ đồ Trợ lý AI &amp; Data Masking</div>
+      <div class="desc">Kiểm tra Rate Limit, bảo mật ẩn giá vốn/SĐT, gọi GPT-4o-mini và cơ chế Fallback an toàn.</div>
+      <div class="btn">Mở Trình xem HTML →</div>
+    </a>
+
+    <a href="images/07_state_order.html" class="card" target="_blank">
+      <div class="tag">Sequence</div>
+      <div class="title">7. Sơ đồ Tuần tự Giao dịch POS</div>
+      <div class="desc">Tương tác tuần tự giữa Thu ngân ➔ React UI ➔ FastAPI Backend ➔ SQLite Transaction Commit.</div>
+      <div class="btn">Mở Trình xem HTML →</div>
+    </a>
+  </div>
+</div>
+</body>
+</html>

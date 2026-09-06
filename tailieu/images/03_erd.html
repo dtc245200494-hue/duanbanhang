@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sơ đồ Quan hệ Thực thể CSDL (ERD - 7 Bảng) - Interactive Viewer</title>
+<style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media (prefers-color-scheme: dark) {
+  body { background: #0f172a; color: #f1f5f9; }
+}
+header {
+  padding: 10px 18px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+@media (prefers-color-scheme: dark) {
+  header { background: #1e293b; border-color: #334155; }
+}
+h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  h1 { color: #60a5fa; }
+}
+.ctl {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+button, input {
+  font: inherit;
+  color: inherit;
+}
+.ctl button {
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.ctl button:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+@media (prefers-color-scheme: dark) {
+  .ctl button { background: #334155; border-color: #475569; }
+  .ctl button:hover { background: #475569; }
+}
+.ctl input {
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  width: 220px;
+}
+@media (prefers-color-scheme: dark) {
+  .ctl input { background: #334155; border-color: #475569; }
+}
+#hits {
+  font-size: 12px;
+  color: #64748b;
+  min-width: 60px;
+}
+#stage {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: #ffffff;
+  cursor: grab;
+  touch-action: none;
+}
+@media (prefers-color-scheme: dark) {
+  #stage { background: #0b0f19; }
+}
+#stage.drag {
+  cursor: grabbing;
+}
+.page {
+  position: absolute;
+  transform-origin: 0 0;
+  display: block;
+}
+.page svg {
+  display: block;
+}
+.hit {
+  filter: drop-shadow(0 0 4px #f59e0b) drop-shadow(0 0 8px #f59e0baa);
+}
+.hit.cursel {
+  filter: drop-shadow(0 0 5px #ef4444) drop-shadow(0 0 12px #ef4444cc);
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>📐 Sơ đồ Quan hệ Thực thể CSDL (ERD - 7 Bảng)</h1>
+  <div class="ctl">
+    <input id="q" type="search" placeholder="🔍 Tìm kiếm thành phần…">
+    <span id="hits"></span>
+    <button id="zout" title="Thu nhỏ">−</button>
+    <button id="zin" title="Phóng to">+</button>
+    <button id="fit" title="Vừa màn hình">Vừa khung</button>
+  </div>
+</header>
+<main id="stage">
+  <div class="page" id="diagram-container">
+    <svg xmlns="http://www.w3.org/2000/svg" width="1380" height="780" viewBox="0 0 1380 780">
+  <defs>
+    <style>
+      .title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 20px; font-weight: bold; fill: #1E3A8A; text-anchor: middle; }
+      .tbl-hdr { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; font-weight: bold; fill: #FFFFFF; text-anchor: middle; dominant-baseline: middle; }
+      .pk { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: bold; fill: #B91C1C; }
+      .fk { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: bold; fill: #1D4ED8; }
+      .col { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #334155; }
+      .card { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #1D4ED8; }
+      .card-orange { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #B45309; }
+      .lbl { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #475569; }
+    </style>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563EB" />
+    </marker>
+    <marker id="arr-orange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#D97706" />
+    </marker>
+  </defs>
+
+  <text x="690" y="35" class="title">SƠ ĐỒ QUAN HỆ THỰC THỂ CSDL (ERD - 7 BẢNG CỐT LÕI SALES.DB)</text>
+
+  <!-- ROW 1 -->
+  <!-- USERS -->
+  <g transform="translate(50, 65)">
+    <rect width="250" height="210" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2" />
+    <rect width="250" height="30" rx="8" fill="#1E3A8A" />
+    <text x="125" y="16" class="tbl-hdr">USERS</text>
+    <text x="14" y="52" class="pk">PK id : integer</text>
+    <text x="14" y="74" class="col">UK username : varchar(50)</text>
+    <text x="14" y="96" class="col">password_hash : varchar(255)</text>
+    <text x="14" y="118" class="col">full_name : varchar(100)</text>
+    <text x="14" y="140" class="col">role : varchar(20)</text>
+    <text x="14" y="162" class="col">is_active : boolean</text>
+    <text x="14" y="184" class="col">created_at : timestamp</text>
+  </g>
+
+  <!-- CATEGORIES -->
+  <g transform="translate(360, 65)">
+    <rect width="230" height="140" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2" />
+    <rect width="230" height="30" rx="8" fill="#1E3A8A" />
+    <text x="115" y="16" class="tbl-hdr">CATEGORIES</text>
+    <text x="14" y="52" class="pk">PK id : integer</text>
+    <text x="14" y="78" class="col">UK name : varchar(100)</text>
+    <text x="14" y="104" class="col">description : text</text>
+  </g>
+
+  <!-- PRODUCTS -->
+  <g transform="translate(680, 65)">
+    <rect width="260" height="260" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2" />
+    <rect width="260" height="30" rx="8" fill="#1E3A8A" />
+    <text x="130" y="16" class="tbl-hdr">PRODUCTS</text>
+    <text x="14" y="52" class="pk">PK id : integer</text>
+    <text x="14" y="72" class="col">UK code : varchar(50)</text>
+    <text x="14" y="92" class="col">name : varchar(200)</text>
+    <text x="14" y="112" class="fk">FK category_id : integer</text>
+    <text x="14" y="132" class="col">import_price : decimal(12,2)</text>
+    <text x="14" y="152" class="col">sell_price : decimal(12,2)</text>
+    <text x="14" y="172" class="col">stock : integer</text>
+    <text x="14" y="192" class="col">status : varchar(20)</text>
+    <text x="14" y="212" class="col">description : text</text>
+  </g>
+
+  <!-- INVENTORIES -->
+  <g transform="translate(1030, 65)">
+    <rect width="250" height="140" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2" />
+    <rect width="250" height="30" rx="8" fill="#1E3A8A" />
+    <text x="125" y="16" class="tbl-hdr">INVENTORIES</text>
+    <text x="14" y="52" class="pk">PK id : integer</text>
+    <text x="14" y="78" class="fk">FK product_id : integer</text>
+    <text x="14" y="104" class="col">quantity : integer</text>
+  </g>
+
+  <!-- ROW 2 -->
+  <!-- CUSTOMERS -->
+  <g transform="translate(50, 440)">
+    <rect width="250" height="190" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2" />
+    <rect width="250" height="30" rx="8" fill="#1E3A8A" />
+    <text x="125" y="16" class="tbl-hdr">CUSTOMERS</text>
+    <text x="14" y="52" class="pk">PK id : integer</text>
+    <text x="14" y="75" class="col">name : varchar(100)</text>
+    <text x="14" y="98" class="col">UK phone : varchar(20)</text>
+    <text x="14" y="121" class="col">email : varchar(100)</text>
+    <text x="14" y="144" class="col">address : text</text>
+    <text x="14" y="167" class="col">customer_group : varchar(50)</text>
+  </g>
+
+  <!-- ORDERS -->
+  <g transform="translate(360, 410)">
+    <rect width="260" height="260" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2" />
+    <rect width="260" height="30" rx="8" fill="#1E3A8A" />
+    <text x="130" y="16" class="tbl-hdr">ORDERS</text>
+    <text x="14" y="52" class="pk">PK id : integer</text>
+    <text x="14" y="72" class="col">UK code : varchar(50)</text>
+    <text x="14" y="92" class="fk">FK customer_id : integer</text>
+    <text x="14" y="112" class="fk">FK user_id : integer</text>
+    <text x="14" y="132" class="col">total_amount : decimal(12,2)</text>
+    <text x="14" y="152" class="col">discount : decimal(12,2)</text>
+    <text x="14" y="172" class="col">final_amount : decimal(12,2)</text>
+    <text x="14" y="192" class="col">payment_method : varchar(30)</text>
+    <text x="14" y="212" class="col">status : varchar(20)</text>
+    <text x="14" y="232" class="col">created_at : timestamp</text>
+  </g>
+
+  <!-- ORDER_DETAILS -->
+  <g transform="translate(700, 440)">
+    <rect width="240" height="190" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2" />
+    <rect width="240" height="30" rx="8" fill="#1E3A8A" />
+    <text x="120" y="16" class="tbl-hdr">ORDER_DETAILS</text>
+    <text x="14" y="52" class="pk">PK id : integer</text>
+    <text x="14" y="78" class="fk">FK order_id : integer</text>
+    <text x="14" y="104" class="fk">FK product_id : integer</text>
+    <text x="14" y="130" class="col">quantity : integer</text>
+    <text x="14" y="156" class="col">price : decimal(12,2)</text>
+    <text x="14" y="178" class="col">total : decimal(12,2)</text>
+  </g>
+
+  <!-- PURCHASE_RECEIPTS -->
+  <g transform="translate(1030, 440)">
+    <rect width="250" height="190" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2" />
+    <rect width="250" height="30" rx="8" fill="#1E3A8A" />
+    <text x="125" y="16" class="tbl-hdr">PURCHASE_RECEIPTS</text>
+    <text x="14" y="52" class="pk">PK id : integer</text>
+    <text x="14" y="75" class="col">UK code : varchar(50)</text>
+    <text x="14" y="98" class="col">supplier : varchar(150)</text>
+    <text x="14" y="121" class="fk">FK user_id : integer</text>
+    <text x="14" y="144" class="col">total_amount : decimal(12,2)</text>
+    <text x="14" y="167" class="col">status : varchar(20)</text>
+    <text x="14" y="186" class="col">created_at : timestamp</text>
+  </g>
+
+  <!-- ================= RELATIONSHIPS & ARROWS ================= -->
+  <!-- 1. CATEGORIES (1) ───► (1..N) PRODUCTS -->
+  <line x1="590" y1="130" x2="670" y2="130" stroke="#2563EB" stroke-width="2" marker-end="url(#arr-blue)" />
+  <text x="598" y="122" class="card">1</text>
+  <text x="645" y="122" class="card">1..N</text>
+  <text x="630" y="145" class="lbl" text-anchor="middle">phân loại</text>
+
+  <!-- 2. PRODUCTS (1) ───► (1..1) INVENTORIES -->
+  <line x1="940" y1="130" x2="1020" y2="130" stroke="#2563EB" stroke-width="2" marker-end="url(#arr-blue)" />
+  <text x="948" y="122" class="card">1</text>
+  <text x="995" y="122" class="card">1..1</text>
+  <text x="980" y="145" class="lbl" text-anchor="middle">tồn kho</text>
+
+  <!-- 3. CUSTOMERS (1) ───► (0..N) ORDERS -->
+  <line x1="300" y1="520" x2="350" y2="520" stroke="#2563EB" stroke-width="2" marker-end="url(#arr-blue)" />
+  <text x="308" y="510" class="card">1</text>
+  <text x="330" y="510" class="card">0..N</text>
+  <text x="325" y="540" class="lbl" text-anchor="middle">đặt mua</text>
+
+  <!-- 4. ORDERS (1) ───► (1..N) ORDER_DETAILS -->
+  <line x1="620" y1="520" x2="690" y2="520" stroke="#2563EB" stroke-width="2" marker-end="url(#arr-blue)" />
+  <text x="628" y="510" class="card">1</text>
+  <text x="665" y="510" class="card">1..N</text>
+  <text x="655" y="540" class="lbl" text-anchor="middle">chi tiết</text>
+
+  <!-- 5. PRODUCTS (1) ───► (0..N) ORDER_DETAILS -->
+  <path d="M 810 325 L 810 430" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arr-blue)" />
+  <text x="818" y="350" class="card">1</text>
+  <text x="818" y="425" class="card">0..N</text>
+
+  <!-- 6. USERS (1) ───► (0..N) ORDERS (Lập đơn) -->
+  <path d="M 230 275 L 230 360 L 450 360 L 450 400" fill="none" stroke="#D97706" stroke-width="2" marker-end="url(#arr-orange)" />
+  <text x="238" y="300" class="card-orange">1</text>
+  <text x="458" y="395" class="card-orange">0..N</text>
+  <text x="330" y="352" class="lbl" fill="#B45309" text-anchor="middle">lập đơn (FK user_id)</text>
+
+  <!-- 7. USERS (1) ───► (0..N) PURCHASE_RECEIPTS (Nhập kho) -->
+  <path d="M 120 275 L 120 380 L 1150 380 L 1150 430" fill="none" stroke="#D97706" stroke-width="2" marker-end="url(#arr-orange)" />
+  <text x="128" y="300" class="card-orange">1</text>
+  <text x="1158" y="425" class="card-orange">0..N</text>
+  <text x="980" y="372" class="lbl" fill="#B45309" text-anchor="middle">nhập kho (FK user_id)</text>
+</svg>
+  </div>
+</main>
+<script>
+const stage = document.getElementById('stage');
+const page = document.getElementById('diagram-container');
+const svg = page.querySelector('svg');
+let view = { x: 0, y: 0, s: 1 };
+
+function apply() {
+  page.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.s})`;
+}
+
+function svgSize() {
+  return [
+    parseFloat(svg.getAttribute('width')) || 1200,
+    parseFloat(svg.getAttribute('height')) || 800
+  ];
+}
+
+function fit() {
+  const [w, h] = svgSize();
+  const r = stage.getBoundingClientRect();
+  const s = Math.min((r.width - 40) / w, (r.height - 40) / h, 2.5);
+  view = { s, x: (r.width - w * s) / 2, y: (r.height - h * s) / 2 };
+  apply();
+}
+
+stage.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = stage.getBoundingClientRect();
+  const mx = e.clientX - r.left;
+  const my = e.clientY - r.top;
+  const k = Math.exp(-e.deltaY * 0.0015);
+  const s = Math.min(Math.max(view.s * k, 0.1), 10);
+  view.x = mx - (mx - view.x) * s / view.s;
+  view.y = my - (my - view.y) * s / view.s;
+  view.s = s;
+  apply();
+}, { passive: false });
+
+let drag = null;
+stage.addEventListener('pointerdown', e => {
+  if (e.target.closest('a')) return;
+  drag = { x: e.clientX, y: e.clientY };
+  stage.classList.add('drag');
+  stage.setPointerCapture(e.pointerId);
+});
+
+stage.addEventListener('pointermove', e => {
+  if (!drag) return;
+  view.x += e.clientX - drag.x;
+  view.y += e.clientY - drag.y;
+  drag = { x: e.clientX, y: e.clientY };
+  apply();
+});
+
+stage.addEventListener('pointerup', () => {
+  drag = null;
+  stage.classList.remove('drag');
+});
+
+function zoom(k) {
+  const r = stage.getBoundingClientRect();
+  const mx = r.width / 2;
+  const my = r.height / 2;
+  const s = Math.min(Math.max(view.s * k, 0.1), 10);
+  view.x = mx - (mx - view.x) * s / view.s;
+  view.y = my - (my - view.y) * s / view.s;
+  view.s = s;
+  apply();
+}
+
+document.getElementById('zin').onclick = () => zoom(1.25);
+document.getElementById('zout').onclick = () => zoom(0.8);
+document.getElementById('fit').onclick = fit;
+
+const q = document.getElementById('q');
+const hitEl = document.getElementById('hits');
+let hits = [], hi = -1;
+
+function search() {
+  hits.forEach(el => el.classList.remove('hit', 'cursel'));
+  hits = [];
+  hi = -1;
+  const t = q.value.trim().toLowerCase();
+  if (t) {
+    const all = [...svg.querySelectorAll('text')];
+    hits = all.filter(el => el.textContent.toLowerCase().includes(t));
+    hits.forEach(el => el.classList.add('hit'));
+  }
+  hitEl.textContent = t ? hits.length + ' kết quả' : '';
+}
+
+function centre(el) {
+  const r = stage.getBoundingClientRect();
+  const b = el.getBoundingClientRect();
+  view.x += r.left + r.width / 2 - (b.left + b.width / 2);
+  view.y += r.top + r.height / 2 - (b.top + b.height / 2);
+  apply();
+}
+
+q.addEventListener('input', search);
+q.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { q.value = ''; search(); q.blur(); }
+  if (e.key !== 'Enter' || !hits.length) return;
+  if (hi >= 0) hits[hi].classList.remove('cursel');
+  hi = (hi + 1) % hits.length;
+  hits[hi].classList.add('cursel');
+  centre(hits[hi]);
+});
+
+window.addEventListener('resize', fit);
+setTimeout(fit, 50);
+</script>
+</body>
+</html>

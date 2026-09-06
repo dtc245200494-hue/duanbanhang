@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sơ đồ Lớp Lĩnh vực (Domain Class Diagram) - Interactive Viewer</title>
+<style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media (prefers-color-scheme: dark) {
+  body { background: #0f172a; color: #f1f5f9; }
+}
+header {
+  padding: 10px 18px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+@media (prefers-color-scheme: dark) {
+  header { background: #1e293b; border-color: #334155; }
+}
+h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  h1 { color: #60a5fa; }
+}
+.ctl {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+button, input {
+  font: inherit;
+  color: inherit;
+}
+.ctl button {
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.ctl button:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+@media (prefers-color-scheme: dark) {
+  .ctl button { background: #334155; border-color: #475569; }
+  .ctl button:hover { background: #475569; }
+}
+.ctl input {
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  width: 220px;
+}
+@media (prefers-color-scheme: dark) {
+  .ctl input { background: #334155; border-color: #475569; }
+}
+#hits {
+  font-size: 12px;
+  color: #64748b;
+  min-width: 60px;
+}
+#stage {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: #ffffff;
+  cursor: grab;
+  touch-action: none;
+}
+@media (prefers-color-scheme: dark) {
+  #stage { background: #0b0f19; }
+}
+#stage.drag {
+  cursor: grabbing;
+}
+.page {
+  position: absolute;
+  transform-origin: 0 0;
+  display: block;
+}
+.page svg {
+  display: block;
+}
+.hit {
+  filter: drop-shadow(0 0 4px #f59e0b) drop-shadow(0 0 8px #f59e0baa);
+}
+.hit.cursel {
+  filter: drop-shadow(0 0 5px #ef4444) drop-shadow(0 0 12px #ef4444cc);
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>📐 Sơ đồ Lớp Lĩnh vực (Domain Class Diagram)</h1>
+  <div class="ctl">
+    <input id="q" type="search" placeholder="🔍 Tìm kiếm thành phần…">
+    <span id="hits"></span>
+    <button id="zout" title="Thu nhỏ">−</button>
+    <button id="zin" title="Phóng to">+</button>
+    <button id="fit" title="Vừa màn hình">Vừa khung</button>
+  </div>
+</header>
+<main id="stage">
+  <div class="page" id="diagram-container">
+    <svg xmlns="http://www.w3.org/2000/svg" width="1380" height="780" viewBox="0 0 1380 780">
+  <defs>
+    <style>
+      .title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 20px; font-weight: bold; fill: #1E3A8A; text-anchor: middle; }
+      .class-hdr { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; font-weight: bold; fill: #FFFFFF; text-anchor: middle; dominant-baseline: middle; }
+      .attr { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #1E293B; }
+      .meth { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; font-style: italic; fill: #0F172A; }
+      .multi { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #1D4ED8; }
+      .multi-orange { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #B45309; }
+      .rel-lbl { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #475569; }
+    </style>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563EB" />
+    </marker>
+    <marker id="arr-orange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#D97706" />
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669" />
+    </marker>
+  </defs>
+
+  <text x="690" y="35" class="title">SƠ ĐỒ LỚP LĨNH VỰC &amp; THỰC THỂ HỆ THỐNG (DOMAIN CLASS DIAGRAM)</text>
+
+  <!-- ROW 1 -->
+  <!-- User (Top Left) -->
+  <g transform="translate(50, 65)">
+    <rect width="250" height="230" rx="8" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+    <rect width="250" height="32" rx="8" fill="#1E3A8A" />
+    <text x="125" y="17" class="class-hdr">«entity» User</text>
+    <text x="12" y="55" class="attr">+ id: int [PK]</text>
+    <text x="12" y="73" class="attr">+ username: str [UK]</text>
+    <text x="12" y="91" class="attr">+ password_hash: str</text>
+    <text x="12" y="109" class="attr">+ full_name: str</text>
+    <text x="12" y="127" class="attr">+ role: str</text>
+    <text x="12" y="145" class="attr">+ is_active: bool</text>
+    <text x="12" y="163" class="attr">+ created_at: datetime</text>
+    <line x1="0" y1="175" x2="250" y2="175" stroke="#1E3A8A" stroke-width="1.2" />
+    <text x="12" y="195" class="meth">+ verify_password(pwd): bool</text>
+    <text x="12" y="213" class="meth">+ is_admin(): bool</text>
+  </g>
+
+  <!-- Category (Top Center Left) -->
+  <g transform="translate(360, 65)">
+    <rect width="230" height="150" rx="8" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+    <rect width="230" height="32" rx="8" fill="#1E3A8A" />
+    <text x="115" y="17" class="class-hdr">«entity» Category</text>
+    <text x="12" y="55" class="attr">+ id: int [PK]</text>
+    <text x="12" y="75" class="attr">+ name: str [UK]</text>
+    <text x="12" y="95" class="attr">+ description: str</text>
+    <line x1="0" y1="110" x2="230" y2="110" stroke="#1E3A8A" stroke-width="1.2" />
+    <text x="12" y="132" class="meth">+ get_active_products(): list</text>
+  </g>
+
+  <!-- Product (Top Center Right) -->
+  <g transform="translate(680, 65)">
+    <rect width="260" height="260" rx="8" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+    <rect width="260" height="32" rx="8" fill="#1E3A8A" />
+    <text x="130" y="17" class="class-hdr">«entity» Product</text>
+    <text x="12" y="55" class="attr">+ id: int [PK]</text>
+    <text x="12" y="73" class="attr">+ code: str [UK]</text>
+    <text x="12" y="91" class="attr">+ name: str</text>
+    <text x="12" y="109" class="attr">+ category_id: int [FK]</text>
+    <text x="12" y="127" class="attr">+ import_price: float</text>
+    <text x="12" y="145" class="attr">+ sell_price: float</text>
+    <text x="12" y="163" class="attr">+ stock: int</text>
+    <text x="12" y="181" class="attr">+ status: str</text>
+    <text x="12" y="199" class="attr">+ description: str</text>
+    <line x1="0" y1="210" x2="260" y2="210" stroke="#1E3A8A" stroke-width="1.2" />
+    <text x="12" y="230" class="meth">+ check_stock(qty): bool</text>
+    <text x="12" y="248" class="meth">+ update_stock(qty): void</text>
+  </g>
+
+  <!-- AIService (Top Right) -->
+  <g transform="translate(1030, 65)">
+    <rect width="250" height="170" rx="8" fill="#F0FDF4" stroke="#059669" stroke-width="2" />
+    <rect width="250" height="32" rx="8" fill="#059669" />
+    <text x="125" y="17" class="class-hdr">«service» AIService</text>
+    <text x="12" y="58" class="attr">- api_key: str</text>
+    <text x="12" y="78" class="attr">- model: str</text>
+    <line x1="0" y1="92" x2="250" y2="92" stroke="#059669" stroke-width="1.2" />
+    <text x="12" y="112" class="meth">+ consult_products(q): str</text>
+    <text x="12" y="132" class="meth">+ analyze_revenue(): str</text>
+    <text x="12" y="152" class="meth">- _mask_sensitive(d): dict</text>
+  </g>
+
+  <!-- ROW 2 -->
+  <!-- PurchaseReceipt (Bottom Left) -->
+  <g transform="translate(50, 460)">
+    <rect width="250" height="210" rx="8" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+    <rect width="250" height="32" rx="8" fill="#1E3A8A" />
+    <text x="125" y="17" class="class-hdr">«entity» PurchaseReceipt</text>
+    <text x="12" y="55" class="attr">+ id: int [PK]</text>
+    <text x="12" y="75" class="attr">+ code: str [UK]</text>
+    <text x="12" y="95" class="attr">+ supplier: str</text>
+    <text x="12" y="115" class="attr">+ user_id: int [FK]</text>
+    <text x="12" y="135" class="attr">+ total_amount: float</text>
+    <text x="12" y="155" class="attr">+ status: str</text>
+    <line x1="0" y1="170" x2="250" y2="170" stroke="#1E3A8A" stroke-width="1.2" />
+    <text x="12" y="192" class="meth">+ confirm_receipt(): void</text>
+  </g>
+
+  <!-- Customer (Bottom Center Left) -->
+  <g transform="translate(360, 460)">
+    <rect width="230" height="200" rx="8" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+    <rect width="230" height="32" rx="8" fill="#1E3A8A" />
+    <text x="115" y="17" class="class-hdr">«entity» Customer</text>
+    <text x="12" y="55" class="attr">+ id: int [PK]</text>
+    <text x="12" y="75" class="attr">+ name: str</text>
+    <text x="12" y="95" class="attr">+ phone: str [UK]</text>
+    <text x="12" y="115" class="attr">+ email: str</text>
+    <text x="12" y="135" class="attr">+ address: str</text>
+    <text x="12" y="155" class="attr">+ customer_group: str</text>
+    <line x1="0" y1="168" x2="230" y2="168" stroke="#1E3A8A" stroke-width="1.2" />
+    <text x="12" y="188" class="meth">+ get_order_history(): list</text>
+  </g>
+
+  <!-- Order (Bottom Center Right) -->
+  <g transform="translate(680, 430)">
+    <rect width="260" height="270" rx="8" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+    <rect width="260" height="32" rx="8" fill="#1E3A8A" />
+    <text x="130" y="17" class="class-hdr">«entity» Order</text>
+    <text x="12" y="55" class="attr">+ id: int [PK]</text>
+    <text x="12" y="73" class="attr">+ code: str [UK]</text>
+    <text x="12" y="91" class="attr">+ customer_id: int [FK]</text>
+    <text x="12" y="109" class="attr">+ user_id: int [FK]</text>
+    <text x="12" y="127" class="attr">+ total_amount: float</text>
+    <text x="12" y="145" class="attr">+ discount: float</text>
+    <text x="12" y="163" class="attr">+ final_amount: float</text>
+    <text x="12" y="181" class="attr">+ payment_method: str</text>
+    <text x="12" y="199" class="attr">+ status: str</text>
+    <text x="12" y="217" class="attr">+ created_at: datetime</text>
+    <line x1="0" y1="228" x2="260" y2="228" stroke="#1E3A8A" stroke-width="1.2" />
+    <text x="12" y="246" class="meth">+ calculate_total(): float</text>
+    <text x="12" y="262" class="meth">+ cancel_and_refund(): bool</text>
+  </g>
+
+  <!-- OrderDetail (Bottom Right) -->
+  <g transform="translate(1030, 460)">
+    <rect width="250" height="200" rx="8" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+    <rect width="250" height="32" rx="8" fill="#1E3A8A" />
+    <text x="125" y="17" class="class-hdr">«entity» OrderDetail</text>
+    <text x="12" y="55" class="attr">+ id: int [PK]</text>
+    <text x="12" y="75" class="attr">+ order_id: int [FK]</text>
+    <text x="12" y="95" class="attr">+ product_id: int [FK]</text>
+    <text x="12" y="115" class="attr">+ quantity: int</text>
+    <text x="12" y="135" class="attr">+ price: float</text>
+    <text x="12" y="155" class="attr">+ total: float</text>
+    <line x1="0" y1="168" x2="250" y2="168" stroke="#1E3A8A" stroke-width="1.2" />
+    <text x="12" y="188" class="meth">+ subtotal(): float</text>
+  </g>
+
+  <!-- ================= RELATIONSHIPS ================= -->
+  <!-- 1. Category 1 ─── 0..* Product -->
+  <line x1="590" y1="130" x2="680" y2="130" stroke="#2563EB" stroke-width="2" />
+  <text x="598" y="122" class="multi">1</text>
+  <text x="655" y="122" class="multi">0..*</text>
+  <text x="635" y="145" class="rel-lbl" text-anchor="middle">chứa</text>
+
+  <!-- 2. Order 1 ◆─── 1..* OrderDetail (Composition) -->
+  <polygon points="940,540 952,548 964,540 952,532" fill="#1E3A8A" stroke="#1E3A8A" />
+  <line x1="964" y1="540" x2="1030" y2="540" stroke="#1E3A8A" stroke-width="2" />
+  <text x="968" y="528" class="multi">1</text>
+  <text x="1005" y="528" class="multi">1..*</text>
+  <text x="985" y="560" class="rel-lbl" text-anchor="middle">«composition»</text>
+
+  <!-- 3. Product 1 ───► 0..* OrderDetail -->
+  <path d="M 940 280 L 985 280 L 985 490 L 1030 490" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arr-blue)" />
+  <text x="948" y="272" class="multi">1</text>
+  <text x="995" y="482" class="multi">0..*</text>
+
+  <!-- 4. Customer 0..1 ───► 0..* Order -->
+  <line x1="590" y1="540" x2="670" y2="540" stroke="#2563EB" stroke-width="2" marker-end="url(#arr-blue)" />
+  <text x="598" y="530" class="multi">0..1</text>
+  <text x="645" y="530" class="multi">0..*</text>
+  <text x="630" y="560" class="rel-lbl" text-anchor="middle">đặt mua</text>
+
+  <!-- 5. User 1 ───► 0..* Order (Lập đơn hàng: Đi qua khe giữa, không cắt qua Category!) -->
+  <path d="M 300 240 L 335 240 L 335 375 L 810 375 L 810 420" fill="none" stroke="#D97706" stroke-width="2" marker-end="url(#arr-orange)" />
+  <text x="308" y="232" class="multi-orange">1</text>
+  <text x="818" y="415" class="multi-orange">0..*</text>
+  <text x="560" y="365" class="rel-lbl" fill="#B45309" text-anchor="middle">lập đơn hàng (creates order)</text>
+
+  <!-- 6. User 1 ───► 0..* PurchaseReceipt (Nhập kho) -->
+  <line x1="175" y1="295" x2="175" y2="450" stroke="#D97706" stroke-width="2" marker-end="url(#arr-orange)" />
+  <text x="185" y="320" class="multi-orange">1</text>
+  <text x="185" y="445" class="multi-orange">0..*</text>
+  <text x="120" y="380" class="rel-lbl" fill="#B45309">nhập kho</text>
+
+  <!-- 7. AIService ─ ─ ─► Product («use») -->
+  <line x1="1030" y1="140" x2="950" y2="140" stroke="#059669" stroke-width="1.8" stroke-dasharray="5,5" marker-end="url(#arr-green)" />
+  <text x="990" y="130" class="rel-lbl" fill="#059669" text-anchor="middle">«use»</text>
+
+  <!-- 8. AIService ─ ─ ─► Order («analyze»: Đi vòng ngoài cùng) -->
+  <path d="M 1280 150 L 1320 150 L 1320 730 L 810 730 L 810 710" fill="none" stroke="#059669" stroke-width="1.8" stroke-dasharray="5,5" marker-end="url(#arr-green)" />
+  <text x="1080" y="748" class="rel-lbl" fill="#059669" text-anchor="middle">«analyze»</text>
+</svg>
+  </div>
+</main>
+<script>
+const stage = document.getElementById('stage');
+const page = document.getElementById('diagram-container');
+const svg = page.querySelector('svg');
+let view = { x: 0, y: 0, s: 1 };
+
+function apply() {
+  page.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.s})`;
+}
+
+function svgSize() {
+  return [
+    parseFloat(svg.getAttribute('width')) || 1200,
+    parseFloat(svg.getAttribute('height')) || 800
+  ];
+}
+
+function fit() {
+  const [w, h] = svgSize();
+  const r = stage.getBoundingClientRect();
+  const s = Math.min((r.width - 40) / w, (r.height - 40) / h, 2.5);
+  view = { s, x: (r.width - w * s) / 2, y: (r.height - h * s) / 2 };
+  apply();
+}
+
+stage.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = stage.getBoundingClientRect();
+  const mx = e.clientX - r.left;
+  const my = e.clientY - r.top;
+  const k = Math.exp(-e.deltaY * 0.0015);
+  const s = Math.min(Math.max(view.s * k, 0.1), 10);
+  view.x = mx - (mx - view.x) * s / view.s;
+  view.y = my - (my - view.y) * s / view.s;
+  view.s = s;
+  apply();
+}, { passive: false });
+
+let drag = null;
+stage.addEventListener('pointerdown', e => {
+  if (e.target.closest('a')) return;
+  drag = { x: e.clientX, y: e.clientY };
+  stage.classList.add('drag');
+  stage.setPointerCapture(e.pointerId);
+});
+
+stage.addEventListener('pointermove', e => {
+  if (!drag) return;
+  view.x += e.clientX - drag.x;
+  view.y += e.clientY - drag.y;
+  drag = { x: e.clientX, y: e.clientY };
+  apply();
+});
+
+stage.addEventListener('pointerup', () => {
+  drag = null;
+  stage.classList.remove('drag');
+});
+
+function zoom(k) {
+  const r = stage.getBoundingClientRect();
+  const mx = r.width / 2;
+  const my = r.height / 2;
+  const s = Math.min(Math.max(view.s * k, 0.1), 10);
+  view.x = mx - (mx - view.x) * s / view.s;
+  view.y = my - (my - view.y) * s / view.s;
+  view.s = s;
+  apply();
+}
+
+document.getElementById('zin').onclick = () => zoom(1.25);
+document.getElementById('zout').onclick = () => zoom(0.8);
+document.getElementById('fit').onclick = fit;
+
+const q = document.getElementById('q');
+const hitEl = document.getElementById('hits');
+let hits = [], hi = -1;
+
+function search() {
+  hits.forEach(el => el.classList.remove('hit', 'cursel'));
+  hits = [];
+  hi = -1;
+  const t = q.value.trim().toLowerCase();
+  if (t) {
+    const all = [...svg.querySelectorAll('text')];
+    hits = all.filter(el => el.textContent.toLowerCase().includes(t));
+    hits.forEach(el => el.classList.add('hit'));
+  }
+  hitEl.textContent = t ? hits.length + ' kết quả' : '';
+}
+
+function centre(el) {
+  const r = stage.getBoundingClientRect();
+  const b = el.getBoundingClientRect();
+  view.x += r.left + r.width / 2 - (b.left + b.width / 2);
+  view.y += r.top + r.height / 2 - (b.top + b.height / 2);
+  apply();
+}
+
+q.addEventListener('input', search);
+q.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { q.value = ''; search(); q.blur(); }
+  if (e.key !== 'Enter' || !hits.length) return;
+  if (hi >= 0) hits[hi].classList.remove('cursel');
+  hi = (hi + 1) % hits.length;
+  hits[hi].classList.add('cursel');
+  centre(hits[hi]);
+});
+
+window.addEventListener('resize', fit);
+setTimeout(fit, 50);
+</script>
+</body>
+</html>
