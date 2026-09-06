@@ -1,5 +1,12 @@
 import random
+import sys
 from datetime import datetime, timedelta
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 from app.auth import hash_password
 from app.database import Base, SessionLocal, engine

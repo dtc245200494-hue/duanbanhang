@@ -86,3 +86,17 @@ class TestOrders:
     def test_empty_items_rejected(self, client, owner_hdr):
         res = client.post("/api/orders", json={"items": []}, headers=owner_hdr)
         assert res.status_code == 422
+
+    def test_duplicate_items_stock_check(self, client, owner_hdr, order_product):
+        # order_product stock is 8 now (10 initial - 2 in first test)
+        # Requesting 2 lines of 5 each (total 10 > 8) should be rejected
+        payload = {
+            "items": [
+                {"product_id": order_product["id"], "quantity": 5},
+                {"product_id": order_product["id"], "quantity": 5},
+            ],
+            "payment_method": "cash",
+        }
+        res = client.post("/api/orders", json=payload, headers=owner_hdr)
+        assert res.status_code == 400
+        assert "không đủ tồn kho" in res.json()["detail"]

@@ -32,39 +32,7 @@ def _to_out(p: Product) -> ProductOut:
     return out
 
 
-def _next_order_code(db: Session) -> str:
-    seq = db.query(Order).count() + 1
-    return f"ORD-{datetime.now():%Y%m%d}-{seq:04d}"
-
-
-def to_order_out(db: Session, order: Order) -> OrderOut:
-    items = []
-    for d in order.details:
-        items.append(
-            OrderItemOut(
-                id=d.id,
-                product_id=d.product_id,
-                product_name=d.product.name if d.product else "",
-                quantity=d.quantity,
-                unit_price=d.unit_price,
-                subtotal=d.subtotal,
-            )
-        )
-    return OrderOut(
-        id=order.id,
-        code=order.code,
-        customer_id=order.customer_id,
-        customer_name=order.customer.name if order.customer else None,
-        created_by=order.user.full_name or (order.user.username if order.user else ""),
-        created_at=order.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-        total_amount=order.total_amount,
-        discount=order.discount,
-        final_amount=order.final_amount,
-        payment_method=order.payment_method,
-        status=order.status,
-        note=order.note or "",
-        items=items,
-    )
+from app.routers.orders import _next_order_code, to_order_out  # re-export for compatibility
 
 
 @router.get("", response_model=List[ProductOut])

@@ -34,7 +34,7 @@ Các mẫu prompt được tách riêng thành các tệp tin trong thư mục `
 - `prompts/sales_report.txt`: Mẫu prompt phân tích báo cáo kinh doanh.
 - `prompts/sales_qa.txt`: Mẫu prompt hỏi đáp nghiệp vụ.
 
-Hệ thống cung cấp hàm nạp và thay thế biến template `load_prompt(name, **kwargs)` trong [ai_service.py](file:///d:/duanbanhang/backend/app/services/ai_service.py).
+Hệ thống cung cấp hàm nạp và thay thế biến template `load_prompt(name, **kwargs)` trong [ai_service.py](../backend/app/services/ai_service.py).
 
 ---
 
@@ -73,7 +73,7 @@ Trong thư mục `prompts/versions/`, nhóm đã lưu trữ và đánh giá chi 
 ---
 
 ## 7. Xử lý lỗi và Các giới hạn AI (Fault Tolerance & Rate Limiting)
-Hệ thống cài đặt đầy đủ các cơ chế phòng vệ tại [ai_service.py](file:///d:/duanbanhang/backend/app/services/ai_service.py):
+Hệ thống cài đặt đầy đủ các cơ chế phòng vệ tại [ai_service.py](../backend/app/services/ai_service.py):
 1. **Che giấu dữ liệu nhạy cảm (Data Masking):**
    ```python
    def mask_sensitive(text: str) -> str:
@@ -103,7 +103,7 @@ Dự án được bao phủ bởi **45 Test Cases** tự động với Pytest:
 - **Vấn đề ban đầu:** Hàm gọi OpenAI không có giới hạn số lần gọi, có nguy cơ bị spam làm tăng chi phí API và nghẽn hệ thống.
 - **Prompt yêu cầu AI Review:** *"Hãy review đoạn code gọi OpenAI trong ai_service.py và đề xuất cơ chế rate limiter dạng in-memory đơn giản và hiệu quả trong Python."*
 - **Đề xuất từ AI:** Cung cấp hàm `_check_rate_limit()` sử dụng danh sách timestamp trượt trong 60 giây.
-- **Triển khai thực tế:** Nhóm đã áp dụng giải pháp này vào [ai_service.py](file:///d:/duanbanhang/backend/app/services/ai_service.py) và viết unit test `test_rate_limit_returns_429` để xác thực.
+- **Triển khai thực tế:** Nhóm đã áp dụng giải pháp này vào [ai_service.py](../backend/app/services/ai_service.py) và viết unit test `test_rate_limit_returns_429` để xác thực.
 
 ---
 

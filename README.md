@@ -33,11 +33,11 @@ Hệ thống quản lý bán hàng đa kênh cho cửa hàng thiết bị công 
 ## 🚀 3. Hướng dẫn cài đặt & Khởi chạy
 
 ### Yêu cầu hệ thống:
-- Python 3.10+ (Đã có sẵn môi trường `.venv` trong thư mục `backend`)
+- Python 3.10+
 - Node.js 18+ và npm
 
 ### Bước 1: Cấu hình biến môi trường
-Kiểm tra file `.env` tại thư mục gốc của dự án:
+Tạo file `.env` tại thư mục gốc của dự án (hoặc sao chép từ `.env.example`):
 ```ini
 DATABASE_URL=sqlite:///./database/sales.db
 OPENAI_API_KEY=your_api_key_here
@@ -45,10 +45,12 @@ SECRET_KEY=aia331-sales-secret-2026
 OPENAI_MODEL=gpt-4o-mini
 ```
 
-### Bước 2: Nạp dữ liệu mẫu (Seed Data)
+### Bước 2: Thiết lập môi trường Backend & Nạp dữ liệu mẫu (Seed Data)
 ```powershell
 cd backend
-.venv\Scripts\python.exe -m app.seed
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt
+.venv\Scripts\python -m app.seed
 cd ..
 ```
 
@@ -64,7 +66,8 @@ backend\.venv\Scripts\python.exe run.py
 Mở cửa sổ Terminal 2:
 ```powershell
 cd frontend
-npm.cmd run dev
+npm install
+npm run dev
 ```
 - **Giao diện Web:** [http://localhost:5173](http://localhost:5173)
 
@@ -88,9 +91,9 @@ backend\.venv\Scripts\pytest.exe backend\tests -v
 ---
 
 ## 📚 6. Hệ thống Tài liệu đánh giá
-Bộ tài liệu chi tiết phục vụ các bài đánh giá học phần đặt tại thư mục [tailieu/](file:///d:/duanbanhang/tailieu/):
-- [Tổng hợp & Mục lục tài liệu](file:///d:/duanbanhang/tailieu/README.md)
-- [Báo cáo TX1 - Phân tích & Thiết kế hệ thống](file:///d:/duanbanhang/tailieu/BAO_CAO_TX1_PHAN_TICH_THIET_KE.md)
-- [Báo cáo TX2 - Lập trình hệ thống quản lý](file:///d:/duanbanhang/tailieu/BAO_CAO_TX2_LAP_TRINH_HE_THONG.md)
-- [Báo cáo TX3 - Tích hợp & Tối ưu hóa AI](file:///d:/duanbanhang/tailieu/BAO_CAO_TX3_TICH_HOP_AI.md)
-- [Báo cáo KTHP & Kịch bản thuyết trình Demo](file:///d:/duanbanhang/tailieu/BAO_CAO_KTHP_VA_KICH_BAN_DEMO.md)
+Bộ tài liệu chi tiết phục vụ các bài đánh giá học phần đặt tại thư mục [tailieu/](./tailieu/):
+- [Tổng hợp & Mục lục tài liệu](./tailieu/README.md)
+- [Báo cáo TX1 - Phân tích & Thiết kế hệ thống](./tailieu/BAO_CAO_TX1_PHAN_TICH_THIET_KE.md)
+- [Báo cáo TX2 - Lập trình hệ thống quản lý](./tailieu/BAO_CAO_TX2_LAP_TRINH_HE_THONG.md)
+- [Báo cáo TX3 - Tích hợp & Tối ưu hóa AI](./tailieu/BAO_CAO_TX3_TICH_HOP_AI.md)
+- [Báo cáo KTHP & Kịch bản thuyết trình Demo](./tailieu/BAO_CAO_KTHP_VA_KICH_BAN_DEMO.md)

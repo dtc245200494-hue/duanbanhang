@@ -1,4 +1,4 @@
-﻿from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -57,12 +57,12 @@ def consult(
         lines = []
         for p in products:
             lines.append(
-                f"- MĂ£ {p.code} | {p.name} | NhĂ³m: {p.category_name or 'KhĂ¡c'} | "
-                f"GiĂ¡ bĂ¡n: {p.sell_price:,.0f} VND | CĂ²n tá»“n: {p.stock} | {p.description or ''}"
+                f"- Mã {p.code} | {p.name} | Nhóm: {p.category_name or 'Khác'} | "
+                f"Giá bán: {p.sell_price:,.0f} VND | Còn tồn: {p.stock} | {p.description or ''}"
             )
         product_table = "\n".join(lines)
     else:
-        product_table = "(Hiá»‡n táº¡i khĂ´ng cĂ²n sáº£n pháº©m nĂ o trong kho)"
+        product_table = "(Hiện tại không còn sản phẩm nào trong kho)"
 
     prompt = ai_service.load_prompt(
         "product_consultant.txt",

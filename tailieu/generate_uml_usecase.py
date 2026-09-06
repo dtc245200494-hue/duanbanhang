@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
 import zipfile
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/')
 
 def create_standard_uml_usecase():
     plt.rcParams['font.sans-serif'] = ['Segoe UI', 'DejaVu Sans', 'Arial']
@@ -143,10 +144,10 @@ def create_standard_uml_usecase():
 
     # Save to all image destinations
     out_paths = [
-        "d:/duanbanhang/tailieu/images/01_use_case.png",
-        "d:/duanbanhang/tailieu/images/image1.png",
-        "d:/duanbanhang/docs/images/01_use_case.png",
-        "d:/duanbanhang/docs/images/image1.png"
+        f"{BASE_DIR}/tailieu/images/01_use_case.png",
+        f"{BASE_DIR}/tailieu/images/image1.png",
+        f"{BASE_DIR}/docs/images/01_use_case.png",
+        f"{BASE_DIR}/docs/images/image1.png"
     ]
     
     for p in out_paths:
@@ -163,7 +164,7 @@ def create_standard_uml_usecase():
             with zipfile.ZipFile(temp_docx, 'w', zipfile.ZIP_DEFLATED) as zout:
                 for item in zin.infolist():
                     if item.filename == 'word/media/image1.png':
-                        with open('d:/duanbanhang/tailieu/images/image1.png', 'rb') as f:
+                        with open(f'{BASE_DIR}/tailieu/images/image1.png', 'rb') as f:
                             zout.writestr(item, f.read())
                     else:
                         zout.writestr(item, zin.read(item.filename))
@@ -171,12 +172,12 @@ def create_standard_uml_usecase():
         print(f"Updated image1 in {docx_path}")
 
     try:
-        update_docx_images('d:/duanbanhang/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx')
+        update_docx_images(f'{BASE_DIR}/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx')
     except Exception as e:
         print("docs error:", e)
 
     try:
-        update_docx_images('d:/duanbanhang/tailieu/BAO_CAO_KT1_NHOM03_MOI.docx')
+        update_docx_images(f'{BASE_DIR}/tailieu/BAO_CAO_KT1_NHOM03_MOI.docx')
     except Exception as e:
         print("tailieu error:", e)
 

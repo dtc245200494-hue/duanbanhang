@@ -1,10 +1,11 @@
 import os
 import xml.etree.ElementTree as ET
 from PIL import Image, ImageDraw, ImageFont
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/')
 
-DRAWIO_DIR = "d:/duanbanhang/tailieu/drawio"
-IMG_TAILIEU = "d:/duanbanhang/tailieu/images"
-IMG_DOCS = "d:/duanbanhang/docs/images"
+DRAWIO_DIR = f"{BASE_DIR}/tailieu/drawio"
+IMG_TAILIEU = f"{BASE_DIR}/tailieu/images"
+IMG_DOCS = f"{BASE_DIR}/docs/images"
 
 os.makedirs(DRAWIO_DIR, exist_ok=True)
 os.makedirs(IMG_TAILIEU, exist_ok=True)

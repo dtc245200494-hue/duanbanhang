@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user
 from app.database import get_db
 from app.models import Customer, Order, Product, User
-from app.routers.products import to_order_out
+from app.routers.orders import to_order_out
 from app.services import export_service, report_service
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])

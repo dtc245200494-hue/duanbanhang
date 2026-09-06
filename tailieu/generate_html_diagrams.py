@@ -1,9 +1,10 @@
 import os
 import html
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/')
 
 TARGET_DIRS = [
-    "d:/duanbanhang/tailieu/images",
-    "d:/duanbanhang/docs/images"
+    f"{BASE_DIR}/tailieu/images",
+    f"{BASE_DIR}/docs/images"
 ]
 
 for d in TARGET_DIRS:

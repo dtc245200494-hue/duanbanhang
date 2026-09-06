@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
 import zipfile
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/')
 
 def create_domain_class_diagram():
     plt.rcParams['font.sans-serif'] = ['Segoe UI', 'DejaVu Sans', 'Arial']
@@ -222,10 +223,10 @@ def create_domain_class_diagram():
 
     # Save to all image destinations
     out_paths = [
-        "d:/duanbanhang/tailieu/images/02_class_diagram.png",
-        "d:/duanbanhang/tailieu/images/image2.png",
-        "d:/duanbanhang/docs/images/02_class_diagram.png",
-        "d:/duanbanhang/docs/images/image2.png"
+        f"{BASE_DIR}/tailieu/images/02_class_diagram.png",
+        f"{BASE_DIR}/tailieu/images/image2.png",
+        f"{BASE_DIR}/docs/images/02_class_diagram.png",
+        f"{BASE_DIR}/docs/images/image2.png"
     ]
     
     for p in out_paths:
@@ -242,7 +243,7 @@ def create_domain_class_diagram():
             with zipfile.ZipFile(temp_docx, 'w', zipfile.ZIP_DEFLATED) as zout:
                 for item in zin.infolist():
                     if item.filename == 'word/media/image2.png':
-                        with open('d:/duanbanhang/tailieu/images/image2.png', 'rb') as f:
+                        with open(f'{BASE_DIR}/tailieu/images/image2.png', 'rb') as f:
                             zout.writestr(item, f.read())
                     else:
                         zout.writestr(item, zin.read(item.filename))
@@ -250,7 +251,7 @@ def create_domain_class_diagram():
         print(f"Updated image2 in {docx_path}")
 
     try:
-        update_docx_images('d:/duanbanhang/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx')
+        update_docx_images(f'{BASE_DIR}/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx')
     except Exception as e:
         print("docs error:", e)
 

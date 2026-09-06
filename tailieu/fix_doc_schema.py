@@ -4,6 +4,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/')
 
 def fix_document_schema(doc_path):
     print(f"Fixing schema in {doc_path}...")
@@ -103,9 +104,9 @@ def fix_document_schema(doc_path):
 
 if __name__ == "__main__":
     paths = [
-        "d:/duanbanhang/tailieu/BAO_CAO_KT1_NHOM03.docx",
-        "d:/duanbanhang/tailieu/BAO_CAO_KT1_NHOM03_MOI.docx",
-        "d:/duanbanhang/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx"
+        f"{BASE_DIR}/tailieu/BAO_CAO_KT1_NHOM03.docx",
+        f"{BASE_DIR}/tailieu/BAO_CAO_KT1_NHOM03_MOI.docx",
+        f"{BASE_DIR}/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx"
     ]
     for p in paths:
         try:

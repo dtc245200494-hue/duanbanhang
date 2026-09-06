@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
 import zipfile
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/')
 
 def create_erd_diagram():
     plt.rcParams['font.sans-serif'] = ['Segoe UI', 'DejaVu Sans', 'Arial']
@@ -201,10 +202,10 @@ def create_erd_diagram():
     ax.text(140, 53.5, "nhập kho (FK user_id)", fontsize=8, color='#B45309', ha='center')
 
     out_paths = [
-        "d:/duanbanhang/tailieu/images/03_erd.png",
-        "d:/duanbanhang/tailieu/images/image3.png",
-        "d:/duanbanhang/docs/images/03_erd.png",
-        "d:/duanbanhang/docs/images/image3.png"
+        f"{BASE_DIR}/tailieu/images/03_erd.png",
+        f"{BASE_DIR}/tailieu/images/image3.png",
+        f"{BASE_DIR}/docs/images/03_erd.png",
+        f"{BASE_DIR}/docs/images/image3.png"
     ]
     
     for p in out_paths:
@@ -216,13 +217,13 @@ def create_erd_diagram():
 
     # Update docx image3
     try:
-        docx_path = 'd:/duanbanhang/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx'
+        docx_path = f'{BASE_DIR}/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx'
         temp_docx = docx_path + '.temp.docx'
         with zipfile.ZipFile(docx_path, 'r') as zin:
             with zipfile.ZipFile(temp_docx, 'w', zipfile.ZIP_DEFLATED) as zout:
                 for item in zin.infolist():
                     if item.filename == 'word/media/image3.png':
-                        with open('d:/duanbanhang/tailieu/images/image3.png', 'rb') as f:
+                        with open(f'{BASE_DIR}/tailieu/images/image3.png', 'rb') as f:
                             zout.writestr(item, f.read())
                     else:
                         zout.writestr(item, zin.read(item.filename))

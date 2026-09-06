@@ -5,6 +5,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
 import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/')
 
 def set_cell_background(cell, fill_color):
     tcPr = cell._element.get_or_add_tcPr()
@@ -140,8 +141,8 @@ def update_document_to_6_weeks(doc_path):
 
 if __name__ == "__main__":
     paths = [
-        "d:/duanbanhang/tailieu/BAO_CAO_KT1_NHOM03_MOI.docx",
-        "d:/duanbanhang/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx"
+        f"{BASE_DIR}/tailieu/BAO_CAO_KT1_NHOM03_MOI.docx",
+        f"{BASE_DIR}/docs/BaoCao_TongHop_QuanLyBanHang_AI_Nhom03.docx"
     ]
     for p in paths:
         try:
