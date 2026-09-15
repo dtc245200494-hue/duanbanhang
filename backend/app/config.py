@@ -1,36 +1,35 @@
+"""Application configuration module following PEP 8 guidelines."""
+
 import os
 from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-
-def _load_dotenv(path: Path) -> None:
-    if not path.exists():
-        return
-    for raw in path.read_text(encoding="utf-8").splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+from typing import Optional
 
 
-_load_dotenv(BASE_DIR / ".env")
+class Settings:
+    """Configuration settings for the Smart Retail application."""
 
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "480"))
+    PROJECT_NAME: str = "Smart Retail & AI Batch Discount System"
+    VERSION: str = "1.0.0"
+    API_V1_STR: str = "/api/v1"
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL") or None
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-AI_TIMEOUT_SECONDS = float(os.getenv("AI_TIMEOUT_SECONDS", "30"))
-AI_MAX_CALLS_PER_MINUTE = int(os.getenv("AI_MAX_CALLS_PER_MINUTE", "12"))
+    # Base paths
+    BASE_DIR: Path = Path(__file__).resolve().parent.parent
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL", f"sqlite:///{BASE_DIR}/sales.db"
+    )
 
-LOW_STOCK_THRESHOLD = int(os.getenv("LOW_STOCK_THRESHOLD", "5"))
+    # AI Configuration
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    AI_TIMEOUT_SECONDS: float = float(os.getenv("AI_TIMEOUT_SECONDS", "3.0"))
+    AI_RATE_LIMIT_PER_MINUTE: int = int(os.getenv("AI_RATE_LIMIT_PER_MINUTE", "30"))
+    PROMPT_VERSION: str = os.getenv("PROMPT_VERSION", "v1")
 
-PROMPTS_DIR = BASE_DIR / "prompts"
+    # Security
+    SECRET_KEY: str = os.getenv(
+        "SECRET_KEY", "supersecretkey-for-smart-retail-system-dev-only"
+    )
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
 
-ROLES = ("admin", "owner")
-CUSTOMER_GROUPS = ("normal", "vip", "wholesale")
-PAYMENT_METHODS = ("cash", "card", "banking")
+
+settings = Settings()

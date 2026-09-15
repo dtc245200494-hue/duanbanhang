@@ -1,19 +1,24 @@
+"""SQLAlchemy models export module (10 relational models matching ERD)."""
+
+from app.models.role import Role
 from app.models.user import User
+from app.models.store import Store
 from app.models.category import Category
 from app.models.product import Product
-from app.models.customer import Customer
-from app.models.order import Order
-from app.models.order_detail import OrderDetail
-from app.models.purchase_receipt import PurchaseReceipt
-from app.models.inventory import Inventory
+from app.models.batch import ProductBatch
+from app.models.ai_recommendation import AIDiscountRecommendation
+from app.models.order import Order, OrderItem
+from app.models.payment import Payment
 
 __all__ = [
+    "Role",
     "User",
+    "Store",
     "Category",
     "Product",
-    "Customer",
+    "ProductBatch",
+    "AIDiscountRecommendation",
     "Order",
-    "OrderDetail",
-    "PurchaseReceipt",
-    "Inventory",
+    "OrderItem",
+    "Payment",
 ]

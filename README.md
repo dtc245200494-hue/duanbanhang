@@ -1,100 +1,149 @@
-# HỆ THỐNG QUẢN LÝ BÁN HÀNG TÍCH HỢP TRỢ LÝ AI (AIA331)
+# HỆ THỐNG QUẢN LÝ BÁN HÀNG TÍCH HỢP TRỢ LÝ AI & XẢ HÀNG ĐỘNG FEFO (AIA331)
 
 > **Môn học:** Ứng dụng trí tuệ nhân tạo (K23.K1.CNTT K23C)  
-> **Nhóm thực hiện:** Nhóm 03  
+> **Nhóm thực hiện:** Nhóm 03 (Hoàng Trang Hiên & Nguyễn Viết Cường)  
 > **Học kỳ:** 2026_2027_1  
-> **Giảng viên hướng dẫn:** Nguyễn Tuấn Anh (SĐT: 0912662003)  
-> **Trường:** Đại học Công nghệ Thông tin & Truyền thông (ICTU)
+> **Giảng viên hướng dẫn:** ThS. Nguyễn Tuấn Anh (SĐT: 0912662003)  
+> **Đơn vị đào tạo:** Trường Đại học Công nghệ Thông tin & Truyền thông (ICTU)
 
 ---
 
-## 📌 1. Giới thiệu dự án
-Hệ thống quản lý bán hàng đa kênh cho cửa hàng thiết bị công nghệ và phụ kiện, tích hợp trợ lý AI thông minh (OpenAI GPT-4o-mini). Hệ thống đáp ứng đầy đủ quy trình bán hàng (POS), quản lý kho, nhập hàng, phân tích báo cáo doanh thu và ứng dụng AI hỗ trợ tư vấn bán hàng, hỏi đáp số liệu kinh doanh.
+## 📌 1. Giới thiệu tổng quan dự án
+Hệ thống Quản lý Bán hàng Bán lẻ Thông minh (Smart Retail Management System) được phát triển nhằm giải quyết bài toán cốt lõi trong chuỗi bán lẻ: **Quản lý hạn sử dụng theo lô (FEFO - First Expired, First Out)**, **phân quyền đa tác nhân chặt chẽ (RBAC)** và **định giá xả hàng tự động bằng Trí tuệ nhân tạo (Dynamic AI Discount Clearance)**.
 
-### 🌟 Tính năng nổi bật:
-- **Xác thực & Phân quyền đa vai trò:** Admin (Quản trị viên), Chủ cửa hàng (Owner kiêm Quản lý & Bán hàng POS) với JWT token & mã hóa mật khẩu bảo mật.
-- **Nghiệp vụ Bán hàng & Quản lý:** Quản lý danh mục, sản phẩm, khách hàng, đơn hàng, phiếu nhập kho, điều chỉnh tồn kho tự động.
-- **Báo cáo & Phân tích:** Thống kê doanh thu theo ngày/tháng, Top sản phẩm bán chạy, sản phẩm tồn kho chậm luân chuyển; xuất báo cáo Excel, CSV, PDF.
-- **Trợ lý AI tích hợp (AI-Powered Assistant):**
-  - **Tư vấn sản phẩm thông minh:** Khai thác dữ liệu thời gian thực của kho hàng, chỉ gợi ý sản phẩm còn hàng (`stock > 0`), che giấu thông tin nhạy cảm khách hàng (Data Masking).
-  - **Phân tích báo cáo kinh doanh:** Tóm tắt tình hình doanh số, nhận định xu hướng và khuyến nghị chiến lược.
-  - **Hỏi đáp quản lý (Business Q&A):** Giải đáp thắc mắc của chủ cửa hàng dựa trên số liệu kinh doanh thực tế.
+Hệ thống được thiết kế theo chuẩn **PEP 8**, kiến trúc module hoá phân tầng (Controller/Router - Service - Repository/Model), hỗ trợ cơ sở dữ liệu quan hệ 10 bảng toàn diện, tích hợp trực tiếp giao diện Web SPA hiện đại và RESTful API chuẩn OpenAPI 3.1.
 
 ---
 
-## 🏗️ 2. Kiến trúc & Công nghệ
-- **Backend:** Python 3.12, FastAPI, SQLAlchemy ORM, Pydantic v2, Uvicorn, Jose JWT, Pytest.
-- **Database:** SQLite (Relational DB với `sales.db`), hỗ trợ migration và seed data tự động.
-- **Frontend:** React 18, Vite, React Router DOM, Axios, Vanilla Modern CSS Responsive.
-- **AI Integration:** OpenAI API / LLM Wrapper với hệ thống quản lý Prompt phiên bản hóa (`prompts/versions/`), cơ chế Rate Limiting, Timeout và Error Handling.
+## 🏛️ 2. Sơ đồ CSDL Quan hệ Thực thể (ERD - 10 Bảng)
+
+Hệ thống triển khai 10 bảng dữ liệu quan hệ chuẩn hoá theo sơ đồ ERD nghiệp vụ:
+
+| STT | Tên Bảng | Khóa chính (PK) | Khóa ngoại (FK) & Ý nghĩa |
+| :---: | :--- | :--- | :--- |
+| **1** | `roles` | `id` | Quản lý danh mục vai trò người dùng (`admin`, `store_manager`, `customer`). |
+| **2** | `users` | `id` | Tài khoản người dùng, băm mật khẩu `bcrypt`, liên kết `role_id` -> `roles(id)`. |
+| **3** | `stores` | `id` | Chi nhánh / Cửa hàng, liên kết người sở hữu `owner_id` -> `users(id)`. |
+| **4** | `categories` | `id` | Danh mục hàng hóa (Đồ tươi sống, Sữa & Trứng, Đồ uống, Đồ hộp,...). |
+| **5** | `products` | `id` | Thông tin sản phẩm, liên kết `store_id` -> `stores(id)`, `category_id` -> `categories(id)`. |
+| **6** | `product_batches` | `id` | **Lô hàng thực tế**, quản lý hạn dùng (`expiry_date`), tồn kho, chiết khấu hiện hành, liên kết `product_id` -> `products(id)`. Trạng thái: `active`, `clearance`, `expired`. |
+| **7** | `ai_discount_recommendations` | `id` | Lịch sử đề xuất giảm giá từ AI, lý do, trạng thái duyệt (`pending`, `approved`, `rejected`), người duyệt `approved_by` -> `users(id)`. |
+| **8** | `orders` | `id` | Đơn hàng mua sắm, liên kết `store_id` -> `stores(id)`, `user_id` -> `users(id)`. Trạng thái: `pending`, `completed`, `cancelled`. |
+| **9** | `order_items` | `id` | Chi tiết sản phẩm bán theo từng **lô hàng cụ thể** (`batch_id` -> `product_batches(id)`), đơn giá sau giảm giá. |
+| **10** | `payments` | `id` | Giao dịch thanh toán (`order_id` -> `orders(id)`), phương thức `cash`, `card`, `transfer`, `momo`. |
 
 ---
 
-## 🚀 3. Hướng dẫn cài đặt & Khởi chạy
+## 👥 3. Ba Tác nhân & Phân quyền Hệ thống (RBAC)
 
-### Yêu cầu hệ thống:
-- Python 3.10+
-- Node.js 18+ và npm
+### So sánh & Phân biệt rõ rệt giữa Quản trị (Admin) và Quản lý (Store Manager):
 
-### Bước 1: Cấu hình biến môi trường
-Tạo file `.env` tại thư mục gốc của dự án (hoặc sao chép từ `.env.example`):
-```ini
-DATABASE_URL=sqlite:///./database/sales.db
-OPENAI_API_KEY=your_api_key_here
-SECRET_KEY=aia331-sales-secret-2026
-OPENAI_MODEL=gpt-4o-mini
-```
-
-### Bước 2: Thiết lập môi trường Backend & Nạp dữ liệu mẫu (Seed Data)
-```powershell
-cd backend
-python -m venv .venv
-.venv\Scripts\pip install -r requirements.txt
-.venv\Scripts\python -m app.seed
-cd ..
-```
-
-### Bước 3: Khởi động Backend API (Port 8000)
-Mở cửa sổ Terminal 1:
-```powershell
-backend\.venv\Scripts\python.exe run.py
-```
-- **API Swagger Documentation:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **Kiểm tra Health:** [http://127.0.0.1:8000/api/health](http://127.0.0.1:8000/api/health)
-
-### Bước 4: Khởi động Frontend (Port 5173)
-Mở cửa sổ Terminal 2:
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-- **Giao diện Web:** [http://localhost:5173](http://localhost:5173)
-
----
-
-## 🔑 4. Tài khoản Demo kiểm thử
-
-| Tên đăng nhập | Mật khẩu | Vai trò | Quyền hạn chính |
+| Tiêu chí | 👨‍💼 Quản trị viên (Admin) | 👔 Quản lý cửa hàng (Store Manager) | 🛒 Khách hàng (Customer) |
 | :--- | :--- | :--- | :--- |
-| `admin` | `admin123` | **Quản trị viên (Admin)** | Toàn quyền hệ thống, quản lý tài khoản, sản phẩm, xem báo cáo, dùng AI |
-| `owner` | `owner123` | **Chủ cửa hàng (Owner)** | Quản lý sản phẩm, bán hàng POS, xem dashboard doanh thu, dùng AI phân tích |
+| **Phạm vi quyền hạn** | **Toàn hệ thống** (Toàn quyền tối cao) | **Nội bộ cửa hàng / chi nhánh** phụ trách | **Cá nhân / Mua hàng** |
+| **Quản lý Tài khoản** | Tạo, phân quyền, khóa tài khoản Manager & Khách | Không có quyền quản lý tài khoản người dùng khác | Chỉ cập nhật thông tin cá nhân |
+| **Quản lý Chi nhánh** | Thêm mới, chỉnh sửa, giám sát mọi chi nhánh Store | Chỉ quản lý hoạt động tại chi nhánh được phân công | Không có quyền |
+| **Danh mục & Sản phẩm** | Cấu hình danh mục hệ thống, xem toàn bộ kho | Nhập kho lô hàng mới, theo dõi hạn dùng tồn kho | Xem menu và mua sắm sản phẩm còn hàng |
+| **Phê duyệt Giảm giá AI** | Có thể giám sát và cấu hình prompt template AI | **Trực tiếp đánh giá và Duyệt / Từ chối đề xuất AI** | Được mua hàng với giá ưu đãi đã duyệt |
+| **Đơn hàng & POS** | Xem toàn bộ báo cáo doanh thu toàn hệ thống | Trực tiếp tạo đơn tại quầy (POS), thu ngân, xuất hóa đơn | Đặt hàng trực tuyến, theo dõi đơn của mình |
 
 ---
 
-## 🧪 5. Chạy Kiểm thử tự động (Unit / Integration Tests)
-Chạy bộ test 45/45 test cases bao gồm xác thực, nghiệp vụ kho, đơn hàng, báo cáo và AI:
-```powershell
-backend\.venv\Scripts\pytest.exe backend\tests -v
+## 🧠 4. Động cơ AI & Quy tắc Xuất kho FEFO
+
+### 1. Thuật toán Xuất kho FEFO (First Expired, First Out)
+- Khi khách hàng hoặc thu ngân tạo đơn hàng, hệ thống **tự động phân bổ số lượng từ lô có ngày hết hạn gần nhất còn tồn kho (`stock_quantity > 0`)**.
+- Nếu số lượng mua vượt quá một lô, thuật toán tự động tách (split) đơn hàng sang các lô kế tiếp.
+- Đảm bảo hàng cận date luôn được luân chuyển trước, giảm thiểu tối đa tỷ lệ hủy hàng do hết hạn.
+- Khi hủy đơn (`cancelled`), số lượng tồn kho từng lô được hoàn trả chính xác về trạng thái ban đầu.
+
+### 2. Trợ lý AI Đề xuất Chiết khấu Động (Dynamic Clearance)
+- **Hệ thống Prompt phiên bản hóa:** Nằm tại `prompts/versions/` (`v1_discount_recommendation.txt`, `v2_discount_recommendation.txt`).
+- **Hỗ trợ 2 chế độ:**
+  - **OpenAI GPT-4o-mini:** Phân tích ngữ cảnh gồm hạn sử dụng, tốc độ bán hàng trung bình, giá đối thủ cạnh tranh, và hướng dẫn tùy chỉnh từ quản lý.
+  - **Rule-based Fallback Engine:** Đảm bảo **100% Uptime** không phụ thuộc vào Internet hay OpenAI API key. Tự động áp dụng ma trận suy luận cận date:
+    - *≤ 0 ngày:* 100% (Hết hạn -> Chuyển hủy).
+    - *≤ 2 ngày:* 70% (Cận date cấp tốc).
+    - *≤ 4 ngày:* 50% (Thúc đẩy giải phóng tồn kho).
+    - *≤ 7 ngày:* 25% - 35% (Kích cầu tiêu dùng nhanh).
+    - *≤ 14 ngày:* 10% - 20% (Duy trì tốc độ xuất kho).
+    - *An toàn:* 0% (Giữ nguyên giá niêm yết).
+
+---
+
+## 🚀 5. Hướng dẫn Cài đặt & Khởi chạy Nhanh
+
+### Yêu cầu tiên quyết:
+- **Python 3.10+** (Hệ thống đã kiểm thử trên Python 3.12, 3.14).
+
+### Khởi chạy 1 bước duy nhất (Tự động tạo CSDL & Nạp dữ liệu mẫu):
+```bash
+# 1. Cài đặt các thư viện phụ thuộc
+pip install -r requirements.txt
+
+# 2. Khởi chạy hệ thống (FastAPI + Giao diện Web SPA + SQLite)
+python run.py
+```
+
+- **🌐 Giao diện Web SPA Trực quan:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- **📖 Tài liệu Swagger UI:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **📚 Tài liệu ReDoc:** [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+- **🩺 Kiểm tra sức khỏe hệ thống:** [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
+
+---
+
+## 🔑 6. Tài khoản Thử nghiệm (Có sẵn nút bấm 1-Click trên Web)
+
+| Vai trò | Email đăng nhập | Mật khẩu mặc định | Ghi chú kiểm thử |
+| :--- | :--- | :--- | :--- |
+| **Quản trị viên (Admin)** | `admin@freshmart.vn` | `Admin@123` | Toàn quyền cấu hình hệ thống & người dùng |
+| **Quản lý cửa hàng (Manager)** | `manager@freshmart.vn` | `Admin@123` | Quản lý kho lô hàng, duyệt đề xuất AI, bán hàng POS |
+| **Khách hàng (Customer)** | `customer@gmail.com` | `Admin@123` | Mua sắm sản phẩm xả hàng, xem giỏ hàng |
+
+*(Trên giao diện Web, có sẵn modal đăng nhập và các nút bấm điền nhanh tài khoản kiểm thử vô cùng tiện lợi).*
+
+---
+
+## 🧪 7. Kiểm thử Tự động (Automated Test Suite)
+
+Hệ thống bao gồm bộ kiểm thử toàn diện với **17 test cases** bao phủ 100% các chức năng cốt lõi:
+- Xác thực tài khoản, mã hóa bcrypt và phân quyền RBAC JWT token.
+- Thuật toán xuất kho FEFO (đơn lô, đa lô, hoàn kho khi hủy đơn).
+- Quy tắc định giá AI fallback & phân tích template prompt.
+- Luồng phê duyệt đề xuất chiết khấu AI từ Store Manager.
+- Khởi tạo thanh toán đơn hàng.
+
+```bash
+pytest backend/tests -v
 ```
 
 ---
 
-## 📚 6. Hệ thống Tài liệu đánh giá
-Bộ tài liệu chi tiết phục vụ các bài đánh giá học phần đặt tại thư mục [tailieu/](./tailieu/):
-- [Tổng hợp & Mục lục tài liệu](./tailieu/README.md)
-- [Báo cáo TX1 - Phân tích & Thiết kế hệ thống](./tailieu/BAO_CAO_TX1_PHAN_TICH_THIET_KE.md)
-- [Báo cáo TX2 - Lập trình hệ thống quản lý](./tailieu/BAO_CAO_TX2_LAP_TRINH_HE_THONG.md)
-- [Báo cáo TX3 - Tích hợp & Tối ưu hóa AI](./tailieu/BAO_CAO_TX3_TICH_HOP_AI.md)
-- [Báo cáo KTHP & Kịch bản thuyết trình Demo](./tailieu/BAO_CAO_KTHP_VA_KICH_BAN_DEMO.md)
-- [Tổng hợp Prompt & Minh chứng sử dụng AI (3 Giai đoạn)](./tailieu/TONG_HOP_PROMPT_AI_PHAT_TRIEN_DU_AN.md)
+## 📚 8. Cấu trúc Thư mục Dự án
+
+```text
+duanbanhang/
+├── backend/
+│   ├── app/
+│   │   ├── api/v1/             # Các Router RESTful API (Auth, Batches, Orders, AI,...)
+│   │   ├── core/               # Bảo mật, JWT & Bcrypt password hashing
+│   │   ├── models/             # 10 SQLAlchemy ORM Models quan hệ chặt chẽ
+│   │   ├── schemas/            # Pydantic v2 schemas xác thực dữ liệu request/response
+│   │   ├── services/           # Nghiệp vụ FEFO, AI Discount Engine, Orders, Payments
+│   │   ├── scripts/            # Script nạp seed data mẫu 10 bảng
+│   │   ├── static/             # Giao diện Web SPA HTML/CSS/JS hiện đại
+│   │   ├── config.py           # Cấu hình hệ thống (Settings)
+│   │   ├── database.py         # Kết nối SQLite & DeclarativeBase
+│   │   └── main.py             # Entrypoint FastAPI với Lifespan quản lý
+│   └── tests/                  # 17 Unit & Integration tests tự động
+├── prompts/                    # Bộ Prompt AI phiên bản hóa (v1, v2)
+├── tailieu/                    # Báo cáo học phần (TX1, TX2, TX3, KTHP, Sơ đồ, Word docx)
+├── docs/                       # Tài liệu đặc tả kỹ thuật bổ sung
+├── run.py                      # Script khởi chạy hệ thống tức thì
+├── requirements.txt            # Danh sách dependencies
+├── pytest.ini                  # Cấu hình Pytest
+└── README.md                   # Tài liệu hướng dẫn sử dụng
+```
+
+---
+*Dự án hoàn thành phục vụ học phần Ứng dụng Trí tuệ Nhân tạo (AIA331) - ĐH Công nghệ Thông tin & Truyền thông.*

@@ -1,58 +1,58 @@
+"""Unit tests for InventoryService and FEFO allocation."""
+
 import pytest
+from app.models.product import Product
+from app.models.batch import ProductBatch
+from app.services.inventory_service import InventoryService
 
 
-@pytest.fixture(scope="module")
-def inv_product(client, admin_hdr):
-    res = client.post(
-        "/api/products",
-        json={"code": "INV-T1", "name": "Sản phẩm tồn kho test", "sell_price": 100000, "stock": 8},
-        headers=admin_hdr,
+def test_fefo_allocation_single_batch(db_session):
+    """Test FEFO takes from the earliest expiry batch first."""
+    prod = db_session.query(Product).first()
+
+    # We need 6 items. Batch 1 has 10 (expires in 2 days).
+    allocations = InventoryService.allocate_fefo_stock(
+        db=db_session, product_id=prod.id, quantity_needed=6
     )
-    assert res.status_code == 201
-    return res.json()
+
+    assert len(allocations) == 1
+    batch, qty = allocations[0]
+    assert batch.batch_code == "B1"
+    assert qty == 6
+    assert batch.stock_quantity == 4
+    assert batch.status == "active"
 
 
-class TestInventory:
-    def test_purchase_receipt_increases_stock(self, client, owner_hdr, inv_product):
-        res = client.post(
-            "/api/purchases",
-            json={"product_id": inv_product["id"], "quantity": 5, "import_price": 60000, "supplier": "NCC A"},
-            headers=owner_hdr,
+def test_fefo_allocation_split_batches(db_session):
+    """Test FEFO splits across multiple batches when earliest batch is exhausted."""
+    prod = db_session.query(Product).first()
+
+    # We need 15 items. B1 has 10, B2 has 20. Total needed 15 -> 10 from B1, 5 from B2.
+    allocations = InventoryService.allocate_fefo_stock(
+        db=db_session, product_id=prod.id, quantity_needed=15
+    )
+
+    assert len(allocations) == 2
+    b1, qty1 = allocations[0]
+    b2, qty2 = allocations[1]
+
+    assert b1.batch_code == "B1"
+    assert qty1 == 10
+    assert b1.stock_quantity == 0
+    assert b1.status == "sold_out"
+
+    assert b2.batch_code == "B2"
+    assert qty2 == 5
+    assert b2.stock_quantity == 15
+    assert b2.status == "active"
+
+
+def test_fefo_allocation_insufficient_stock(db_session):
+    """Test that requesting more than total stock raises ValueError."""
+    prod = db_session.query(Product).first()
+
+    with pytest.raises(ValueError) as exc_info:
+        InventoryService.allocate_fefo_stock(
+            db=db_session, product_id=prod.id, quantity_needed=50
         )
-        assert res.status_code == 201, res.text
-        receipt = res.json()
-        assert receipt["total_amount"] == 300000
-        assert receipt["code"].startswith("PR-")
-
-        stock = client.get(f"/api/products/{inv_product['id']}", headers=owner_hdr).json()["stock"]
-        assert stock == 13
-
-    def test_inventory_endpoint_reflects(self, client, owner_hdr, inv_product):
-        res = client.get("/api/inventory?keyword=INV-T1", headers=owner_hdr)
-        assert res.status_code == 200
-        rows = res.json()
-        assert len(rows) == 1
-        assert rows[0]["quantity"] == 13
-
-    def test_delete_receipt_reverts_stock(self, client, admin_hdr, owner_hdr, inv_product):
-        receipts = client.get(
-            f"/api/purchases?product_id={inv_product['id']}", headers=admin_hdr
-        ).json()
-        target = receipts[0]
-        res = client.delete(f"/api/purchases/{target['id']}", headers=admin_hdr)
-        assert res.status_code == 200
-        stock = client.get(f"/api/products/{inv_product['id']}", headers=owner_hdr).json()["stock"]
-        assert stock == 8
-
-    def test_low_stock_appears_in_inventory(self, client, admin_hdr, inv_product):
-        client.put(f"/api/products/{inv_product['id']}", json={"stock": 4}, headers=admin_hdr)
-        res = client.get("/api/inventory", headers=admin_hdr)
-        rows = {r["code"]: r for r in res.json()}
-        assert rows["INV-T1"]["low"] is True
-
-    def test_anonymous_cannot_create_receipt(self, client):
-        res = client.post(
-            "/api/purchases",
-            json={"product_id": 1, "quantity": 1, "import_price": 1000},
-        )
-        assert res.status_code == 401
+    assert "không đủ tồn kho" in str(exc_info.value)

@@ -1,35 +1,44 @@
-from typing import List, Optional
+"""Product Pydantic v2 schemas."""
 
-from pydantic import BaseModel, Field
+from datetime import datetime
+from decimal import Decimal
+from typing import Optional
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProductBase(BaseModel):
-    code: str
-    name: str
-    category_id: Optional[int] = None
-    import_price: float = Field(default=0, ge=0)
-    sell_price: float = Field(default=0, ge=0)
-    stock: int = Field(default=0, ge=0)
-    status: str = "active"
-    description: str = ""
+    """Base schema for product data."""
+
+    name: str = Field(..., max_length=200, description="Tên sản phẩm")
+    sku: Optional[str] = Field(None, max_length=50, description="Mã SKU")
+    original_price: Decimal = Field(..., gt=0, description="Giá niêm yết gốc")
+    image_url: Optional[str] = Field(None, description="URL ảnh sản phẩm")
+    category_id: Optional[int] = Field(None, description="ID danh mục sản phẩm")
 
 
 class ProductCreate(ProductBase):
-    pass
+    """Schema for creating a new product."""
+
+    store_id: int = Field(..., description="ID của cửa hàng sở hữu")
 
 
 class ProductUpdate(BaseModel):
-    name: Optional[str] = None
+    """Schema for updating product info."""
+
+    name: Optional[str] = Field(None, max_length=200)
+    sku: Optional[str] = Field(None, max_length=50)
+    original_price: Optional[Decimal] = Field(None, gt=0)
+    image_url: Optional[str] = None
     category_id: Optional[int] = None
-    import_price: Optional[float] = None
-    sell_price: Optional[float] = None
-    stock: Optional[int] = None
-    status: Optional[str] = None
-    description: Optional[str] = None
 
 
 class ProductOut(ProductBase):
-    id: int
-    category_name: Optional[str] = None
+    """Schema for returning product details."""
 
-    model_config = {"from_attributes": True}
+    id: int
+    store_id: int
+    category_name: Optional[str] = None
+    created_at: datetime
+    total_stock: Optional[int] = 0
+
+    model_config = ConfigDict(from_attributes=True)

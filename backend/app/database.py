@@ -1,38 +1,41 @@
-import os
-from pathlib import Path
+"""Database connection and session management module."""
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from typing import Generator
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
+from app.config import settings
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-
-def _resolve_database_url() -> str:
-    url = os.getenv("DATABASE_URL")
-    if not url:
-        db_path = BASE_DIR / "database" / "sales.db"
-        db_path.parent.mkdir(parents=True, exist_ok=True)
-        return f"sqlite:///{db_path.as_posix()}"
-    if url.startswith("sqlite:///"):
-        path_part = url.replace("sqlite:///", "", 1)
-        if path_part:
-            p = Path(path_part) if Path(path_part).is_absolute() else BASE_DIR / path_part
-            p.parent.mkdir(parents=True, exist_ok=True)
-            url = f"sqlite:///{p.as_posix()}"
-    return url
-
-
-DATABASE_URL = _resolve_database_url()
+# SQLite connection args to allow multi-threaded access in FastAPI
+connect_args = {"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
 
 engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
+    settings.DATABASE_URL,
+    connect_args=connect_args,
+    echo=False,
 )
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
-Base = declarative_base()
 
 
-def get_db():
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    """Enable foreign key constraints for SQLite."""
+    if "sqlite" in settings.DATABASE_URL:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+class Base(DeclarativeBase):
+    """Base declarative class allowing unmapped types or modern mapped annotations."""
+
+    __allow_unmapped__ = True
+
+
+def get_db() -> Generator[Session, None, None]:
+    """Dependency for obtaining a SQLAlchemy session."""
     db = SessionLocal()
     try:
         yield db

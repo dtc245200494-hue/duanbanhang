@@ -1,38 +1,52 @@
+"""User and Authentication Pydantic v2 schemas."""
+
 from typing import Optional
-
-from pydantic import BaseModel, Field
-
-
-class LoginIn(BaseModel):
-    username: str
-    password: str
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserBase(BaseModel):
-    username: str
-    full_name: str = ""
-    role: str = "owner"
+    """Base schema for user data."""
+
+    email: str = Field(..., max_length=150, description="Email đăng nhập")
+    full_name: str = Field(..., max_length=100, description="Họ và tên đầy đủ")
+    phone: Optional[str] = Field(None, max_length=20, description="Số điện thoại")
 
 
 class UserCreate(UserBase):
-    password: str = Field(min_length=4)
+    """Schema for registering a new user."""
+
+    password: str = Field(..., min_length=6, description="Mật khẩu tài khoản")
+    role_code: Optional[str] = Field("customer", description="Mã vai trò: admin, store_manager, customer")
 
 
-class UserUpdate(BaseModel):
-    full_name: Optional[str] = None
-    role: Optional[str] = None
-    password: Optional[str] = None
-    status: Optional[str] = None
+class UserLogin(BaseModel):
+    """Schema for user login credentials."""
+
+    email: str
+    password: str
 
 
 class UserOut(UserBase):
+    """Schema for returning user profile."""
+
     id: int
-    status: str
+    role_id: int
+    role_code: Optional[str] = None
+    role_name: Optional[str] = None
+    is_active: bool
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)
 
 
-class TokenOut(BaseModel):
+class Token(BaseModel):
+    """Schema for returning JWT access token."""
+
     access_token: str
     token_type: str = "bearer"
     user: UserOut
+
+
+class TokenPayload(BaseModel):
+    """Schema representing decoded JWT payload."""
+
+    sub: Optional[str] = None

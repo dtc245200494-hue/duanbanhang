@@ -1,11 +1,18 @@
-from sqlalchemy import Column, Integer, String
+"""Product Category model module."""
 
+from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 
 class Category(Base):
+    """Product category entity grouping related merchandise."""
+
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100), unique=True, nullable=False, index=True)
-    description = Column(String(255), default="")
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False, unique=True, index=True)
+    description = Column(Text, nullable=True)
+
+    # Relationships
+    products = relationship("Product", back_populates="category")

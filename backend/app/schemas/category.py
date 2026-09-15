@@ -1,21 +1,33 @@
+"""Product Category Pydantic v2 schemas."""
+
 from typing import Optional
+from pydantic import BaseModel, ConfigDict, Field
 
-from pydantic import BaseModel
+
+class CategoryBase(BaseModel):
+    """Base schema for merchandise categories."""
+
+    name: str = Field(..., max_length=100, description="Tên danh mục (Đồ tươi sống, Sữa...)")
+    description: Optional[str] = Field(None, description="Mô tả danh mục")
 
 
-class CategoryIn(BaseModel):
-    name: str
-    description: str = ""
+class CategoryCreate(CategoryBase):
+    """Schema for creating a category."""
+
+    pass
 
 
 class CategoryUpdate(BaseModel):
-    name: Optional[str] = None
+    """Schema for updating a category."""
+
+    name: Optional[str] = Field(None, max_length=100)
     description: Optional[str] = None
 
 
-class CategoryOut(BaseModel):
-    id: int
-    name: str
-    description: str
+class CategoryOut(CategoryBase):
+    """Schema for returning category details."""
 
-    model_config = {"from_attributes": True}
+    id: int
+    product_count: Optional[int] = 0
+
+    model_config = ConfigDict(from_attributes=True)
