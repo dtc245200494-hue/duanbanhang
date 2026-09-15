@@ -57,6 +57,11 @@
           <span>💳</span>
           <span>Giao Dịch Thanh Toán</span>
         </li>
+        <li class="nav-item" data-tab="users" onclick="window.switchTab('users')" id="nav-users">
+          <span>👥</span>
+          <span>Quản Trị Tài Khoản</span>
+          <span class="badge badge-critical" style="font-size: 0.65rem;">Admin</span>
+        </li>
       </ul>
 
       <!-- User Bar & Role Switcher -->
@@ -258,9 +263,9 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+        <div id="categories-grid-box" style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
           <!-- Add Category Form -->
-          <div class="table-card" style="padding: 24px;">
+          <div class="table-card" id="card-add-category" style="padding: 24px;">
             <h3 style="font-size: 1.05rem; margin-bottom: 16px; font-weight: 600;">+ Thêm Danh Mục Mới</h3>
             <form id="cat-form">
               <div class="form-group">
@@ -488,6 +493,48 @@
               </thead>
               <tbody id="payments-tbody">
                 <tr><td colspan="7" style="text-align:center; padding: 30px;">Đang tải giao dịch thanh toán...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. USERS & ROLES VIEW (ADMIN ONLY) -->
+      <section id="view-users" class="tab-view" style="display: none;">
+        <div class="top-banner">
+          <div>
+            <h2 class="page-title">👥 Quản Trị Người Dùng & Phân Quyền (Users & Roles)</h2>
+            <p class="page-desc">Chức năng dành riêng cho Quản trị viên (Admin): Giám sát toàn bộ tài khoản, vai trò và phạm vi quyền hạn trong hệ thống.</p>
+          </div>
+          <div class="action-controls">
+            <span class="badge badge-critical" style="font-size: 0.85rem; padding: 6px 14px;">🛡️ Khu vực Bảo Mật Cấp Admin</span>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-card-header">
+            <div>
+              <div class="table-title">Danh Sách Tài Khoản Hệ Thống (Bảng users & roles)</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+                Phân định 3 tác nhân rõ ràng: <strong>Admin</strong> (toàn quyền hệ thống), <strong>Store Manager</strong> (quản lý vận hành chi nhánh), <strong>Customer</strong> (chỉ mua sắm trực tuyến).
+              </div>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Họ và Tên</th>
+                  <th>Email Đăng Nhập</th>
+                  <th>Số Điện Thoại</th>
+                  <th>Vai Trò (Role)</th>
+                  <th>Trạng Thái</th>
+                  <th>Phạm Vi Phân Quyền</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody">
+                <tr><td colspan="7" style="text-align:center; padding: 30px;">Đang tải danh sách người dùng...</td></tr>
               </tbody>
             </table>
           </div>

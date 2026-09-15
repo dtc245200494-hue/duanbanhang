@@ -21,13 +21,18 @@ def list_orders(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ) -> List[OrderOut]:
     """Retrieve list of orders with items and payment transactions."""
     query = db.query(Order)
+    # If authenticated user is a customer, only show their own orders
+    if current_user and current_user.role and current_user.role.code == "customer":
+        query = query.filter(Order.user_id == current_user.id)
+    elif user_id:
+        query = query.filter(Order.user_id == user_id)
+
     if store_id:
         query = query.filter(Order.store_id == store_id)
-    if user_id:
-        query = query.filter(Order.user_id == user_id)
     if status_filter:
         query = query.filter(Order.status == status_filter)
 

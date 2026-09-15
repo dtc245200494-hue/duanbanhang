@@ -196,7 +196,9 @@ export const API = {
 
   // Orders
   async getOrders() {
-    const res = await fetch(`${API_BASE}/orders`);
+    const res = await fetch(`${API_BASE}/orders`, {
+      headers: this.getAuthHeaders(),
+    });
     return res.json();
   },
 
@@ -222,7 +224,9 @@ export const API = {
   // Payments
   async getPayments(orderId = null) {
     const url = orderId ? `${API_BASE}/payments?order_id=${orderId}` : `${API_BASE}/payments`;
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: this.getAuthHeaders(),
+    });
     return res.json();
   },
 

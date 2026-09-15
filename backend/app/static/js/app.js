@@ -176,24 +176,56 @@ window.renderUserBar = function () {
 window.applyRolePermissions = function () {
   const role = state.currentUser ? state.currentUser.role_code : 'customer';
 
-  // Define allowed tabs per role
+  // Strict allowed tabs per role: Customer only sees shopping, categories, and their own orders
   const permissions = {
-    customer: ['dashboard', 'categories', 'pos', 'orders'],
+    customer: ['pos', 'categories', 'orders'],
     store_manager: ['dashboard', 'expiring', 'recommendations', 'categories', 'products', 'pos', 'orders', 'payments'],
-    admin: ['dashboard', 'expiring', 'recommendations', 'categories', 'products', 'pos', 'orders', 'payments'],
+    admin: ['dashboard', 'expiring', 'recommendations', 'categories', 'products', 'pos', 'orders', 'payments', 'users'],
   };
 
   const allowedTabs = permissions[role] || permissions['customer'];
 
+  // Toggle sidebar items visibility
   document.querySelectorAll('.nav-item').forEach((el) => {
     const tabName = el.dataset.tab;
     const isAllowed = allowedTabs.includes(tabName);
     el.classList.toggle('hidden-by-role', !isAllowed);
   });
 
-  // If user is on an unauthorized tab, redirect to pos or dashboard
+  // Dynamic UI label & element adjustments for customer vs staff/admin
+  const isCustomer = role === 'customer';
+  const navPosText = document.querySelector('#nav-pos span:last-child');
+  if (navPosText) navPosText.textContent = isCustomer ? 'Mua Sắm Trực Tuyến' : 'Bán Hàng (POS)';
+
+  const navOrdersText = document.querySelector('#nav-orders span:last-child');
+  if (navOrdersText) navOrdersText.textContent = isCustomer ? 'Đơn Hàng Của Tôi' : 'Đơn Đặt Hàng';
+
+  // Hide admin/manager creation controls when viewed by customer
+  const cardAddCat = document.getElementById('card-add-category');
+  const catGridBox = document.getElementById('categories-grid-box');
+  if (cardAddCat) cardAddCat.style.display = isCustomer ? 'none' : 'block';
+  if (catGridBox) catGridBox.style.gridTemplateColumns = isCustomer ? '1fr' : '1fr 2fr';
+
+  const btnAddProd = document.getElementById('btn-open-product-modal');
+  if (btnAddProd) btnAddProd.style.display = isCustomer ? 'none' : 'inline-flex';
+
+  // POS view customization
+  const posTitleEl = document.querySelector('#view-pos .page-title');
+  const posDescEl = document.querySelector('#view-pos .page-desc');
+  if (posTitleEl) posTitleEl.textContent = isCustomer ? '🛍️ Mua Sắm Hàng Hóa Trực Tuyến' : '🛍️ Điểm Bán Hàng & Đặt Hàng (POS)';
+  if (posDescEl) posDescEl.textContent = isCustomer ? 'Chọn mua sản phẩm tươi ngon, tự động hưởng giá ưu đãi tốt nhất từ lô hàng cận date (FEFO).' : 'Tạo đơn bán lẻ cho khách hàng, tự động trừ kho lô date gần nhất (FEFO) và khởi tạo giao dịch thanh toán.';
+
+  // Auto-fill customer details in POS if logged in
+  if (isCustomer && state.currentUser) {
+    const nameInput = document.getElementById('pos-customer-name');
+    const phoneInput = document.getElementById('pos-phone');
+    if (nameInput && !nameInput.value) nameInput.value = state.currentUser.full_name;
+    if (phoneInput && !phoneInput.value) phoneInput.value = state.currentUser.phone || '';
+  }
+
+  // If user is on an unauthorized tab, redirect to their default home tab
   if (!allowedTabs.includes(state.currentTab)) {
-    window.switchTab(allowedTabs[0] || 'pos');
+    window.switchTab(allowedTabs[0]);
   }
 };
 
@@ -203,9 +235,9 @@ window.applyRolePermissions = function () {
 window.switchTab = (tabId) => {
   const role = state.currentUser ? state.currentUser.role_code : 'customer';
   const permissions = {
-    customer: ['dashboard', 'categories', 'pos', 'orders'],
+    customer: ['pos', 'categories', 'orders'],
     store_manager: ['dashboard', 'expiring', 'recommendations', 'categories', 'products', 'pos', 'orders', 'payments'],
-    admin: ['dashboard', 'expiring', 'recommendations', 'categories', 'products', 'pos', 'orders', 'payments'],
+    admin: ['dashboard', 'expiring', 'recommendations', 'categories', 'products', 'pos', 'orders', 'payments', 'users'],
   };
   const allowed = permissions[role] || permissions['customer'];
   if (!allowed.includes(tabId)) {
@@ -229,6 +261,7 @@ window.switchTab = (tabId) => {
   if (tabId === 'pos') loadPOSView();
   if (tabId === 'orders') loadOrdersView();
   if (tabId === 'payments') loadPaymentsView();
+  if (tabId === 'users') loadUsersView();
 };
 
 // 1. Dashboard View
@@ -628,13 +661,19 @@ window.handleCreateOrder = async function (e) {
 // 7. Orders View
 window.loadOrdersView = async function () {
   try {
+    const isCustomer = state.currentUser && state.currentUser.role_code === 'customer';
+    const ordersTitleEl = document.querySelector('#view-orders .page-title');
+    const ordersDescEl = document.querySelector('#view-orders .page-desc');
+    if (ordersTitleEl) ordersTitleEl.textContent = isCustomer ? '📋 Đơn Hàng Của Tôi' : '📋 Quản Lý Đơn Đặt Hàng';
+    if (ordersDescEl) ordersDescEl.textContent = isCustomer ? 'Lịch sử mua sắm và tiến độ xử lý các đơn hàng bạn đã đặt.' : 'Toàn bộ đơn hàng từ khách hàng và quầy POS, trạng thái xuất kho FEFO và thanh toán.';
+
     const orders = await API.getOrders();
     state.orders = orders;
     const tbody = document.getElementById('orders-tbody');
     if (!tbody) return;
 
     if (orders.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted); padding: 40px;">Chưa có đơn hàng nào.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted); padding: 40px;">${isCustomer ? 'Bạn chưa có đơn hàng nào. Hãy mua sắm ngay!' : 'Chưa có đơn hàng nào.'}</td></tr>`;
       return;
     }
 
@@ -760,6 +799,51 @@ window.markPaymentPaid = async function (paymentId) {
     loadPaymentsView();
   } catch (err) {
     showToast('Lỗi cập nhật thanh toán: ' + err.message, 'danger');
+  }
+};
+
+// 9. Users & Roles Management View (Admin Only)
+window.loadUsersView = async function () {
+  try {
+    const users = await API.getUsers();
+    const tbody = document.getElementById('users-tbody');
+    if (!tbody) return;
+
+    if (!Array.isArray(users) || users.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 40px;">Không thể tải danh sách người dùng hoặc tài khoản của bạn không có quyền Admin.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = users
+      .map((u) => {
+        let roleBadge = '';
+        let permDesc = '';
+        if (u.role_code === 'admin') {
+          roleBadge = '<span class="badge badge-critical">👑 Quản trị viên (Admin)</span>';
+          permDesc = 'Toàn quyền: Quản trị tài khoản, phân quyền, cấu hình chi nhánh & giám sát toàn bộ hệ thống.';
+        } else if (u.role_code === 'store_manager') {
+          roleBadge = '<span class="badge badge-info">🏪 Quản lý (Store Manager)</span>';
+          permDesc = 'Vận hành cửa hàng: Quản lý kho, lô hàng FEFO, duyệt chiết khấu AI, bán hàng POS và quản lý đơn.';
+        } else {
+          roleBadge = '<span class="badge badge-success">🛒 Khách hàng (Customer)</span>';
+          permDesc = 'Mua sắm: Xem danh mục, đặt hàng trực tuyến và theo dõi đơn hàng của chính mình.';
+        }
+
+        return `
+        <tr>
+          <td><strong>#USR-${u.id}</strong></td>
+          <td><strong style="color: #fff;">${u.full_name}</strong></td>
+          <td><span style="color: #818cf8; font-weight: 500;">${u.email}</span></td>
+          <td>${u.phone || '-'}</td>
+          <td>${roleBadge}</td>
+          <td>${u.is_active ? '<span class="badge badge-success">✓ Đang hoạt động</span>' : '<span class="badge badge-critical">✕ Bị khóa</span>'}</td>
+          <td style="font-size: 0.82rem; color: var(--text-muted);">${permDesc}</td>
+        </tr>
+      `;
+      })
+      .join('');
+  } catch (err) {
+    showToast('Lỗi khi tải danh sách người dùng: ' + err.message, 'danger');
   }
 };
 
