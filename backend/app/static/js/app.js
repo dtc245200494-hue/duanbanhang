@@ -1117,6 +1117,7 @@ window.handleAddProduct = async function (e) {
 document.addEventListener('DOMContentLoaded', async () => {
   window.initTheme();
   await window.initAuth();
+  window.switchTab('dashboard');
 
   const posForm = document.getElementById('pos-form');
   if (posForm) posForm.addEventListener('submit', window.handleCreateOrder);
