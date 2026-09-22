@@ -52,14 +52,14 @@ const showToast = (message, type = 'success') => {
 // THEME MANAGEMENT (DARK / LIGHT PRO MAX)
 // ==========================================
 window.initTheme = function () {
-  const savedTheme = localStorage.getItem('smartretail_theme') || 'dark';
+  const savedTheme = localStorage.getItem('smartretail_theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
   window.updateThemeUI(savedTheme);
 };
 
 window.toggleTheme = function () {
-  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-  const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', nextTheme);
   localStorage.setItem('smartretail_theme', nextTheme);
   window.updateThemeUI(nextTheme);
