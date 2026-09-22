@@ -12,9 +12,12 @@ const state = {
   recommendations: [],
   payments: [],
   activeAIMyBatch: null,
+  latestAIRecommendation: null,
 };
 
-// Utilities
+// ==========================================
+// UTILITIES & TOAST (PRO MAX INTERACTION)
+// ==========================================
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
@@ -24,12 +27,74 @@ const showToast = (message, type = 'success') => {
   if (!container) return;
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
+  
+  const iconSvg =
+    type === 'success'
+      ? `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+      : type === 'danger'
+      ? `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>`
+      : `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
+
   toast.innerHTML = `
-    <span>${type === 'success' ? '✓' : '⚠'}</span>
-    <div>${message}</div>
+    ${iconSvg}
+    <div style="flex: 1; font-weight: 500;">${message}</div>
   `;
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    toast.style.transition = 'all 0.25s ease';
+    setTimeout(() => toast.remove(), 250);
+  }, 4000);
+};
+
+// ==========================================
+// THEME MANAGEMENT (DARK / LIGHT PRO MAX)
+// ==========================================
+window.initTheme = function () {
+  const savedTheme = localStorage.getItem('smartretail_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  window.updateThemeUI(savedTheme);
+};
+
+window.toggleTheme = function () {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', nextTheme);
+  localStorage.setItem('smartretail_theme', nextTheme);
+  window.updateThemeUI(nextTheme);
+};
+
+window.updateThemeUI = function (theme) {
+  const sunIcon = document.getElementById('theme-icon-sun');
+  const moonIcon = document.getElementById('theme-icon-moon');
+  const btnText = document.getElementById('theme-btn-text');
+  const label = document.getElementById('theme-label');
+  if (sunIcon && moonIcon) {
+    sunIcon.style.display = theme === 'light' ? 'inline-block' : 'none';
+    moonIcon.style.display = theme === 'dark' ? 'inline-block' : 'none';
+  }
+  if (btnText) {
+    btnText.textContent = theme === 'light' ? 'Chế độ Sáng' : 'Chế độ Tối';
+  }
+  if (label) {
+    label.textContent = theme === 'light' ? 'Theme: Sáng' : 'Theme: Tối';
+  }
+};
+
+// Mobile Sidebar Control
+window.toggleMobileSidebar = function () {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar) sidebar.classList.toggle('mobile-open');
+  if (overlay) overlay.classList.toggle('visible');
+};
+
+window.closeMobileSidebar = function () {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar) sidebar.classList.remove('mobile-open');
+  if (overlay) overlay.classList.remove('visible');
 };
 
 // ==========================================
@@ -104,7 +169,6 @@ window.handleRegisterSubmit = async function (e) {
       role_code: roleCode,
     });
     showToast('Đăng ký thành công! Đang tự động đăng nhập...');
-    // Auto login
     const res = await API.login(email, password);
     state.currentUser = res.user;
     window.renderUserBar();
@@ -123,7 +187,7 @@ window.quickLoginAs = async function (email) {
     window.renderUserBar();
     window.applyRolePermissions();
     window.closeAuthModal();
-    showToast(`Đã đăng nhập vai trò: ${res.user.role_name || res.user.role_code}`);
+    showToast(`Đã chuyển sang: ${res.user.role_name || res.user.role_code}`);
     window.switchTab(state.currentTab);
   } catch (err) {
     showToast('Lỗi đăng nhập nhanh: ' + err.message, 'danger');
@@ -152,7 +216,10 @@ window.renderUserBar = function () {
       roleEl.className = 'badge ' + (user.role_code === 'admin' ? 'badge-critical' : user.role_code === 'store_manager' ? 'badge-info' : 'badge-success');
     }
     if (btnAuthEl) {
-      btnAuthEl.innerHTML = '🚪 Đăng Xuất';
+      btnAuthEl.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <span>Thoát</span>
+      `;
       btnAuthEl.onclick = window.handleLogout;
       btnAuthEl.className = 'btn btn-secondary btn-sm';
     }
@@ -163,7 +230,10 @@ window.renderUserBar = function () {
       roleEl.className = 'badge badge-warning';
     }
     if (btnAuthEl) {
-      btnAuthEl.innerHTML = '🔑 Đăng Nhập';
+      btnAuthEl.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/></svg>
+        <span>Đăng Nhập</span>
+      `;
       btnAuthEl.onclick = () => window.openAuthModal('login');
       btnAuthEl.className = 'btn btn-primary btn-sm';
     }
@@ -176,7 +246,7 @@ window.renderUserBar = function () {
 window.applyRolePermissions = function () {
   const role = state.currentUser ? state.currentUser.role_code : 'customer';
 
-  // Strict allowed tabs per role: Customer only sees shopping, categories, and their own orders
+  // Allowed tabs per role
   const permissions = {
     customer: ['pos', 'categories', 'orders'],
     store_manager: ['dashboard', 'expiring', 'recommendations', 'categories', 'products', 'pos', 'orders', 'payments'],
@@ -192,7 +262,6 @@ window.applyRolePermissions = function () {
     el.classList.toggle('hidden-by-role', !isAllowed);
   });
 
-  // Dynamic UI label & element adjustments for customer vs staff/admin
   const isCustomer = role === 'customer';
   const navPosText = document.querySelector('#nav-pos span:last-child');
   if (navPosText) navPosText.textContent = isCustomer ? 'Mua Sắm Trực Tuyến' : 'Bán Hàng (POS)';
@@ -200,24 +269,14 @@ window.applyRolePermissions = function () {
   const navOrdersText = document.querySelector('#nav-orders span:last-child');
   if (navOrdersText) navOrdersText.textContent = isCustomer ? 'Đơn Hàng Của Tôi' : 'Đơn Đặt Hàng';
 
-  // Hide admin/manager creation controls when viewed by customer
   const cardAddCat = document.getElementById('card-add-category');
   const catGridBox = document.getElementById('categories-grid-box');
   if (cardAddCat) cardAddCat.style.display = isCustomer ? 'none' : 'block';
   if (catGridBox) catGridBox.style.gridTemplateColumns = isCustomer ? '1fr' : '1fr 2fr';
 
-  const btnAddProd = document.getElementById('btn-open-product-modal');
-  if (btnAddProd) btnAddProd.style.display = isCustomer ? 'none' : 'inline-flex';
-
-  // POS view customization
-  const posTitleEl = document.querySelector('#view-pos .page-title');
-  const posDescEl = document.querySelector('#view-pos .page-desc');
-  if (posTitleEl) posTitleEl.textContent = isCustomer ? '🛍️ Mua Sắm Hàng Hóa Trực Tuyến' : '🛍️ Điểm Bán Hàng & Đặt Hàng (POS)';
-  if (posDescEl) posDescEl.textContent = isCustomer ? 'Chọn mua sản phẩm tươi ngon, tự động hưởng giá ưu đãi tốt nhất từ lô hàng cận date (FEFO).' : 'Tạo đơn bán lẻ cho khách hàng, tự động trừ kho lô date gần nhất (FEFO) và khởi tạo giao dịch thanh toán.';
-
   // Auto-fill customer details in POS if logged in
   if (isCustomer && state.currentUser) {
-    const nameInput = document.getElementById('pos-customer-name');
+    const nameInput = document.getElementById('pos-name');
     const phoneInput = document.getElementById('pos-phone');
     if (nameInput && !nameInput.value) nameInput.value = state.currentUser.full_name;
     if (phoneInput && !phoneInput.value) phoneInput.value = state.currentUser.phone || '';
@@ -233,6 +292,8 @@ window.applyRolePermissions = function () {
 // TAB NAVIGATION & VIEW LOADERS
 // ==========================================
 window.switchTab = (tabId) => {
+  window.closeMobileSidebar();
+
   const role = state.currentUser ? state.currentUser.role_code : 'customer';
   const permissions = {
     customer: ['pos', 'categories', 'orders'],
@@ -283,8 +344,11 @@ async function loadDashboard() {
     state.recommendations = recs;
     state.payments = payments;
 
+    // KPI Metrics calculation
     const criticalCount = expiring.filter((b) => b.days_until_expiry <= 3).length;
-    const totalRevenue = orders.reduce((acc, o) => acc + parseFloat(o.total_amount || 0), 0);
+    const totalRevenue = payments
+      .filter((p) => p.status === 'paid')
+      .reduce((sum, p) => sum + parseFloat(p.amount), 0);
 
     document.getElementById('kpi-products').textContent = products.length;
     document.getElementById('kpi-expiring').textContent = expiring.length;
@@ -314,39 +378,40 @@ async function loadDashboard() {
       .map((b) => {
         let urgencyBadge = '';
         if (b.days_until_expiry <= 3) {
-          urgencyBadge = `<span class="badge badge-critical">Còn ${b.days_until_expiry} ngày (Khẩn cấp)</span>`;
+          urgencyBadge = `<span class="badge badge-critical"><span class="badge-dot"></span>Còn ${b.days_until_expiry} ngày (Khẩn cấp)</span>`;
         } else if (b.days_until_expiry <= 7) {
-          urgencyBadge = `<span class="badge badge-warning">Còn ${b.days_until_expiry} ngày</span>`;
+          urgencyBadge = `<span class="badge badge-warning"><span class="badge-dot"></span>Còn ${b.days_until_expiry} ngày</span>`;
         } else {
-          urgencyBadge = `<span class="badge badge-info">Còn ${b.days_until_expiry} ngày</span>`;
+          urgencyBadge = `<span class="badge badge-info"><span class="badge-dot"></span>Còn ${b.days_until_expiry} ngày</span>`;
         }
 
         return `
         <tr>
           <td>
-            <div class="product-cell">
-              <div>
-                <div class="product-name">${b.product_name}</div>
-                <div class="product-sku">Lô: <strong>${b.batch_code || '#' + b.id}</strong></div>
-              </div>
-            </div>
+            <div style="font-weight: 600; color: var(--text-primary);">${b.product_name}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">Lô: <strong style="color: var(--primary);">${b.batch_code || '#' + b.id}</strong> • ${b.store_name || 'Chi nhánh'}</div>
           </td>
-          <td><strong>${b.stock_quantity}</strong> hộp/gói</td>
+          <td><strong>${b.stock_quantity}</strong> sản phẩm</td>
           <td>${urgencyBadge}</td>
           <td>
             ${
               b.discount_rate > 0
-                ? `<span class="price-strike">${formatCurrency(b.original_price)}</span>
-                   <span class="price-discounted">${formatCurrency(b.effective_unit_price)}</span>
-                   <span class="discount-pill">-${b.discount_rate}%</span>`
-                : `<span>${formatCurrency(b.original_price)}</span>`
+                ? `<span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.8rem;">${formatCurrency(b.original_price)}</span>
+                   <div style="font-weight: 700; color: var(--success);">${formatCurrency(b.effective_unit_price)} <span class="badge badge-critical" style="padding: 1px 6px; font-size: 0.7rem;">-${b.discount_rate}%</span></div>`
+                : `<strong style="color: var(--text-primary);">${formatCurrency(b.original_price)}</strong>`
             }
           </td>
           <td>
             ${
               isManagerOrAdmin
-                ? `<button class="btn btn-primary btn-sm" onclick="window.openAIModal(${b.id})">🤖 AI Gợi ý</button>`
-                : `<button class="btn btn-success btn-sm" onclick="window.switchTab('pos')">🛒 Mua Ngay</button>`
+                ? `<button class="btn btn-ai btn-sm" onclick="window.openAIModal(${b.id})">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                    <span>AI Gợi ý</span>
+                   </button>`
+                : `<button class="btn btn-primary btn-sm" onclick="window.switchTab('pos')">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span>Mua Ngay</span>
+                   </button>`
             }
           </td>
         </tr>
@@ -379,19 +444,19 @@ window.loadExpiringView = async function () {
       .map((b) => {
         let urgencyBadge = '';
         if (b.days_until_expiry <= 3) {
-          urgencyBadge = `<span class="badge badge-critical">Còn ${b.days_until_expiry} ngày</span>`;
+          urgencyBadge = `<span class="badge badge-critical"><span class="badge-dot"></span>Còn ${b.days_until_expiry} ngày</span>`;
         } else if (b.days_until_expiry <= 7) {
-          urgencyBadge = `<span class="badge badge-warning">Còn ${b.days_until_expiry} ngày</span>`;
+          urgencyBadge = `<span class="badge badge-warning"><span class="badge-dot"></span>Còn ${b.days_until_expiry} ngày</span>`;
         } else {
-          urgencyBadge = `<span class="badge badge-info">Còn ${b.days_until_expiry} ngày</span>`;
+          urgencyBadge = `<span class="badge badge-info"><span class="badge-dot"></span>Còn ${b.days_until_expiry} ngày</span>`;
         }
 
         return `
         <tr>
-          <td><strong>${b.batch_code || '#' + b.id}</strong></td>
+          <td><strong style="color: var(--primary);">${b.batch_code || '#' + b.id}</strong></td>
           <td>
-            <div class="product-name">${b.product_name}</div>
-            <div class="product-sku">SKU: ${b.product_sku || 'N/A'} • ${b.store_name || 'Kho chính'}</div>
+            <div style="font-weight: 600;">${b.product_name}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">SKU: ${b.product_sku || 'N/A'} • ${b.store_name || 'Kho chính'}</div>
           </td>
           <td><strong>${b.stock_quantity}</strong></td>
           <td>${b.expiry_date}</td>
@@ -399,19 +464,21 @@ window.loadExpiringView = async function () {
           <td>
             ${
               b.discount_rate > 0
-                ? `<span class="price-strike">${formatCurrency(b.original_price)}</span><br>
-                   <span class="price-discounted">${formatCurrency(b.effective_unit_price)}</span>
-                   <span class="discount-pill">-${b.discount_rate}%</span>`
-                : `<span>${formatCurrency(b.original_price)}</span>`
+                ? `<span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.8rem;">${formatCurrency(b.original_price)}</span><br>
+                   <strong style="color: var(--success);">${formatCurrency(b.effective_unit_price)}</strong>
+                   <span class="badge badge-critical" style="padding: 1px 6px; font-size: 0.7rem;">-${b.discount_rate}%</span>`
+                : `<strong>${formatCurrency(b.original_price)}</strong>`
             }
           </td>
           <td>
             <div style="display: flex; gap: 8px;">
-              <button class="btn btn-primary btn-sm" onclick="window.openAIModal(${b.id})">
-                🤖 AI Phân tích
+              <button class="btn btn-ai btn-sm" onclick="window.openAIModal(${b.id})">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                <span>AI Phân tích</span>
               </button>
               <button class="btn btn-secondary btn-sm" onclick="window.quickApplyAI(${b.id})">
-                ⚡ Áp dụng nhanh
+                <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>Áp dụng nhanh</span>
               </button>
             </div>
           </td>
@@ -444,22 +511,22 @@ window.loadRecommendationsView = async function () {
       .map((r) => {
         let statusBadge = '';
         if (r.status === 'approved') {
-          statusBadge = `<span class="badge badge-success">✓ Đã duyệt (${r.approver_name || 'Quản lý'})</span>`;
+          statusBadge = `<span class="badge badge-success"><span class="badge-dot"></span>Đã duyệt (${r.approver_name || 'Quản lý'})</span>`;
         } else if (r.status === 'rejected') {
-          statusBadge = `<span class="badge badge-critical">✕ Từ chối</span>`;
+          statusBadge = `<span class="badge badge-critical"><span class="badge-dot"></span>Từ chối</span>`;
         } else {
-          statusBadge = `<span class="badge badge-warning">⏳ Chờ duyệt</span>`;
+          statusBadge = `<span class="badge badge-warning"><span class="badge-dot"></span>Chờ duyệt</span>`;
         }
 
         return `
         <tr>
           <td><strong>#${r.id}</strong></td>
           <td>
-            <div class="product-name">${r.product_name || 'Sản phẩm'}</div>
-            <div class="product-sku">Lô: <strong>${r.batch_code || '#' + r.batch_id}</strong></div>
+            <div style="font-weight: 600;">${r.product_name || 'Sản phẩm'}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">Lô: <strong style="color: var(--primary);">${r.batch_code || '#' + r.batch_id}</strong></div>
           </td>
-          <td><strong style="color: #f87171; font-size: 1.1rem;">-${r.recommended_discount}%</strong></td>
-          <td style="max-width: 320px; font-size: 0.85rem; color: var(--text-secondary);">${r.reason}</td>
+          <td><strong style="color: var(--danger); font-size: 1.15rem;">-${r.recommended_discount}%</strong></td>
+          <td style="max-width: 300px; font-size: 0.85rem; color: var(--text-secondary);">${r.reason}</td>
           <td>${statusBadge}</td>
           <td style="font-size: 0.8rem; color: var(--text-muted);">${new Date(r.created_at).toLocaleString('vi-VN')}</td>
           <td>
@@ -467,8 +534,14 @@ window.loadRecommendationsView = async function () {
               r.status === 'pending'
                 ? `
               <div style="display: flex; gap: 8px;">
-                <button class="btn btn-success btn-sm" onclick="window.handleApproveRec(${r.id})">✓ Duyệt</button>
-                <button class="btn btn-danger btn-sm" onclick="window.handleRejectRec(${r.id})">✕ Bỏ</button>
+                <button class="btn btn-success btn-sm" onclick="window.handleApproveRec(${r.id})">
+                  <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Duyệt</span>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="window.handleRejectRec(${r.id})">
+                  <svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                  <span>Bỏ</span>
+                </button>
               </div>
             `
                 : '<span style="color: var(--text-muted); font-size: 0.8rem;">Đã xử lý</span>'
@@ -516,9 +589,9 @@ window.loadCategoriesView = async function () {
       .map(
         (c) => `
       <tr>
-        <td>#${c.id}</td>
+        <td><strong>#${c.id}</strong></td>
         <td><strong>${c.name}</strong></td>
-        <td>${c.description || '-'}</td>
+        <td style="color: var(--text-secondary);">${c.description || '-'}</td>
         <td><span class="badge badge-info">${c.product_count} sản phẩm</span></td>
       </tr>
     `
@@ -558,22 +631,18 @@ window.loadProductsView = async function () {
       .map(
         (p) => `
       <tr>
-        <td>#${p.id}</td>
+        <td><strong>#${p.id}</strong></td>
         <td>
-          <div class="product-cell">
-            <img src="${p.image_url || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=100'}" class="product-img" alt="${p.name}">
-            <div>
-              <div class="product-name">${p.name}</div>
-              <div class="product-sku">SKU: ${p.sku || 'N/A'} • Danh mục: <strong>${p.category_name || 'Khác'}</strong></div>
-            </div>
-          </div>
+          <div style="font-weight: 600;">${p.name}</div>
+          <div style="font-size: 0.78rem; color: var(--text-muted);">SKU: ${p.sku || 'N/A'} • Danh mục: <strong>${p.category_name || 'Khác'}</strong></div>
         </td>
-        <td>${formatCurrency(p.original_price)}</td>
-        <td><strong>${p.total_stock}</strong> sp</td>
-        <td>${new Date(p.created_at).toLocaleDateString('vi-VN')}</td>
+        <td><strong style="color: var(--primary);">${formatCurrency(p.original_price)}</strong></td>
+        <td><span class="badge badge-success">${p.total_stock} sản phẩm</span></td>
+        <td style="font-size: 0.8rem; color: var(--text-muted);">${new Date(p.created_at).toLocaleDateString('vi-VN')}</td>
         <td>
           <button class="btn btn-secondary btn-sm" onclick="window.openAddBatchModal(${p.id}, '${p.name}')">
-            + Nhập Lô Mới
+            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Nhập Lô Mới</span>
           </button>
         </td>
       </tr>
@@ -585,7 +654,7 @@ window.loadProductsView = async function () {
   }
 };
 
-// 6. POS / Checkout View
+// 6. POS / Checkout View (Live Receipt Preview)
 window.loadPOSView = async function () {
   try {
     const [stores, products, categories] = await Promise.all([
@@ -597,13 +666,11 @@ window.loadPOSView = async function () {
     state.products = products;
     state.categories = categories;
 
-    // Fill Store select
     const storeSelect = document.getElementById('pos-store');
     if (storeSelect) {
       storeSelect.innerHTML = stores.map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
     }
 
-    // Fill Product select
     const prodSelect = document.getElementById('pos-product');
     if (prodSelect) {
       prodSelect.innerHTML = products
@@ -614,15 +681,42 @@ window.loadPOSView = async function () {
         .join('');
     }
 
-    // Fill customer defaults if user is logged in
     if (state.currentUser) {
       const nameInput = document.getElementById('pos-name');
       const phoneInput = document.getElementById('pos-phone');
       if (nameInput && !nameInput.value) nameInput.value = state.currentUser.full_name;
       if (phoneInput && !phoneInput.value) phoneInput.value = state.currentUser.phone || '';
     }
+
+    window.updatePOSPreview();
   } catch (err) {
     showToast('Lỗi nạp thông tin POS', 'danger');
+  }
+};
+
+window.updatePOSPreview = function () {
+  const prodSelect = document.getElementById('pos-product');
+  const qtyInput = document.getElementById('pos-quantity');
+  const methodSelect = document.getElementById('pos-payment-method');
+
+  if (!prodSelect || !qtyInput) return;
+
+  const prodId = parseInt(prodSelect.value, 10);
+  const qty = parseInt(qtyInput.value, 10) || 1;
+  const method = methodSelect ? methodSelect.value : 'COD';
+
+  const product = state.products.find((p) => p.id === prodId);
+  const prodEl = document.getElementById('pos-preview-prod');
+  const qtyEl = document.getElementById('pos-preview-qty');
+  const methodEl = document.getElementById('pos-preview-method');
+  const totalEl = document.getElementById('pos-preview-total');
+
+  if (product && prodEl) {
+    prodEl.textContent = product.name;
+    if (qtyEl) qtyEl.textContent = qty;
+    if (methodEl) methodEl.textContent = method.toUpperCase();
+    const estTotal = product.original_price * qty;
+    if (totalEl) totalEl.textContent = formatCurrency(estTotal);
   }
 };
 
@@ -662,11 +756,6 @@ window.handleCreateOrder = async function (e) {
 window.loadOrdersView = async function () {
   try {
     const isCustomer = state.currentUser && state.currentUser.role_code === 'customer';
-    const ordersTitleEl = document.querySelector('#view-orders .page-title');
-    const ordersDescEl = document.querySelector('#view-orders .page-desc');
-    if (ordersTitleEl) ordersTitleEl.textContent = isCustomer ? '📋 Đơn Hàng Của Tôi' : '📋 Quản Lý Đơn Đặt Hàng';
-    if (ordersDescEl) ordersDescEl.textContent = isCustomer ? 'Lịch sử mua sắm và tiến độ xử lý các đơn hàng bạn đã đặt.' : 'Toàn bộ đơn hàng từ khách hàng và quầy POS, trạng thái xuất kho FEFO và thanh toán.';
-
     const orders = await API.getOrders();
     state.orders = orders;
     const tbody = document.getElementById('orders-tbody');
@@ -682,16 +771,16 @@ window.loadOrdersView = async function () {
     tbody.innerHTML = orders
       .map((o) => {
         let statusBadge = '';
-        if (o.status === 'completed') statusBadge = '<span class="badge badge-success">Hoàn thành</span>';
-        else if (o.status === 'shipping') statusBadge = '<span class="badge badge-info">Đang giao</span>';
-        else if (o.status === 'confirmed') statusBadge = '<span class="badge badge-warning">Đã xác nhận</span>';
-        else if (o.status === 'cancelled') statusBadge = '<span class="badge badge-critical">Đã hủy</span>';
-        else statusBadge = '<span class="badge badge-warning">Chờ xử lý</span>';
+        if (o.status === 'completed') statusBadge = '<span class="badge badge-success"><span class="badge-dot"></span>Hoàn thành</span>';
+        else if (o.status === 'shipping') statusBadge = '<span class="badge badge-info"><span class="badge-dot"></span>Đang giao</span>';
+        else if (o.status === 'confirmed') statusBadge = '<span class="badge badge-warning"><span class="badge-dot"></span>Đã xác nhận</span>';
+        else if (o.status === 'cancelled') statusBadge = '<span class="badge badge-critical"><span class="badge-dot"></span>Đã hủy</span>';
+        else statusBadge = '<span class="badge badge-warning"><span class="badge-dot"></span>Chờ xử lý</span>';
 
         const payment = o.payments && o.payments.length > 0 ? o.payments[0] : null;
         let payBadge = '<span class="badge badge-warning">Chờ thanh toán</span>';
         if (payment && payment.status === 'paid') {
-          payBadge = `<span class="badge badge-success">✓ Đã TT (${payment.payment_method.toUpperCase()})</span>`;
+          payBadge = `<span class="badge badge-success"><span class="badge-dot"></span>Đã TT (${payment.payment_method.toUpperCase()})</span>`;
         }
 
         const itemsSummary = o.items
@@ -703,17 +792,17 @@ window.loadOrdersView = async function () {
 
         return `
         <tr>
-          <td><strong>#${o.id}</strong></td>
+          <td><strong style="color: var(--primary);">#${o.id}</strong></td>
           <td>
             <div style="font-weight: 600;">${o.customer_name}</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">${o.customer_phone}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">${o.customer_phone}</div>
             <div style="font-size: 0.78rem; color: var(--text-muted);">${o.shipping_address}</div>
           </td>
           <td>${itemsSummary}</td>
-          <td><strong>${formatCurrency(o.total_amount)}</strong></td>
+          <td><strong style="color: var(--primary);">${formatCurrency(o.total_amount)}</strong></td>
           <td>${payBadge}</td>
           <td>${statusBadge}</td>
-          <td>${new Date(o.created_at).toLocaleString('vi-VN')}</td>
+          <td style="font-size: 0.8rem; color: var(--text-muted);">${new Date(o.created_at).toLocaleString('vi-VN')}</td>
           <td>
             ${
               isManagerOrAdmin
@@ -726,7 +815,7 @@ window.loadOrdersView = async function () {
                 <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>Hủy (Hoàn kho)</option>
               </select>
             `
-                : `<span style="font-size: 0.8rem; color: var(--text-muted);">${o.status.toUpperCase()}</span>`
+                : `<span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">${o.status.toUpperCase()}</span>`
             }
           </td>
         </tr>
@@ -764,22 +853,25 @@ window.loadPaymentsView = async function () {
     tbody.innerHTML = payments
       .map((p) => {
         let statusBadge = '';
-        if (p.status === 'paid') statusBadge = '<span class="badge badge-success">✓ Đã thanh toán</span>';
-        else if (p.status === 'failed') statusBadge = '<span class="badge badge-critical">✕ Thất bại</span>';
-        else statusBadge = '<span class="badge badge-warning">⏳ Chờ thu tiền</span>';
+        if (p.status === 'paid') statusBadge = '<span class="badge badge-success"><span class="badge-dot"></span>Đã thanh toán</span>';
+        else if (p.status === 'failed') statusBadge = '<span class="badge badge-critical"><span class="badge-dot"></span>Thất bại</span>';
+        else statusBadge = '<span class="badge badge-warning"><span class="badge-dot"></span>Chờ thu tiền</span>';
 
         return `
         <tr>
-          <td><strong>#PAY-${p.id}</strong></td>
+          <td><strong style="color: var(--primary);">#PAY-${p.id}</strong></td>
           <td>Đơn hàng <strong>#${p.order_id}</strong></td>
           <td><span class="badge badge-info">${p.payment_method.toUpperCase()}</span></td>
-          <td><strong>${formatCurrency(p.amount)}</strong></td>
+          <td><strong style="color: var(--primary);">${formatCurrency(p.amount)}</strong></td>
           <td>${statusBadge}</td>
-          <td>${p.paid_at ? new Date(p.paid_at).toLocaleString('vi-VN') : '-'}</td>
+          <td style="font-size: 0.8rem; color: var(--text-muted);">${p.paid_at ? new Date(p.paid_at).toLocaleString('vi-VN') : '-'}</td>
           <td>
             ${
               p.status !== 'paid'
-                ? `<button class="btn btn-success btn-sm" onclick="window.markPaymentPaid(${p.id})">✓ Xác Nhận Đã Thu</button>`
+                ? `<button class="btn btn-success btn-sm" onclick="window.markPaymentPaid(${p.id})">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Xác Nhận Thu</span>
+                   </button>`
                 : '<span style="color: var(--text-muted); font-size: 0.8rem;">Đã quyết toán</span>'
             }
           </td>
@@ -819,24 +911,24 @@ window.loadUsersView = async function () {
         let roleBadge = '';
         let permDesc = '';
         if (u.role_code === 'admin') {
-          roleBadge = '<span class="badge badge-critical">👑 Quản trị viên (Admin)</span>';
+          roleBadge = '<span class="badge badge-critical"><span class="badge-dot"></span>Quản trị viên (Admin)</span>';
           permDesc = 'Toàn quyền: Quản trị tài khoản, phân quyền, cấu hình chi nhánh & giám sát toàn bộ hệ thống.';
         } else if (u.role_code === 'store_manager') {
-          roleBadge = '<span class="badge badge-info">🏪 Quản lý (Store Manager)</span>';
-          permDesc = 'Vận hành cửa hàng: Quản lý kho, lô hàng FEFO, duyệt chiết khấu AI, bán hàng POS và quản lý đơn.';
+          roleBadge = '<span class="badge badge-info"><span class="badge-dot"></span>Quản lý (Store Manager)</span>';
+          permDesc = 'Vận hành chi nhánh: Quản lý kho, lô hàng FEFO, duyệt chiết khấu AI, bán hàng POS và đơn hàng.';
         } else {
-          roleBadge = '<span class="badge badge-success">🛒 Khách hàng (Customer)</span>';
-          permDesc = 'Mua sắm: Xem danh mục, đặt hàng trực tuyến và theo dõi đơn hàng của chính mình.';
+          roleBadge = '<span class="badge badge-success"><span class="badge-dot"></span>Khách hàng (Customer)</span>';
+          permDesc = 'Mua sắm: Xem danh mục, đặt hàng trực tuyến và theo dõi đơn hàng cá nhân.';
         }
 
         return `
         <tr>
           <td><strong>#USR-${u.id}</strong></td>
-          <td><strong style="color: #fff;">${u.full_name}</strong></td>
-          <td><span style="color: #818cf8; font-weight: 500;">${u.email}</span></td>
+          <td><strong style="color: var(--text-primary);">${u.full_name}</strong></td>
+          <td><span style="color: var(--primary); font-weight: 500;">${u.email}</span></td>
           <td>${u.phone || '-'}</td>
           <td>${roleBadge}</td>
-          <td>${u.is_active ? '<span class="badge badge-success">✓ Đang hoạt động</span>' : '<span class="badge badge-critical">✕ Bị khóa</span>'}</td>
+          <td>${u.is_active ? '<span class="badge badge-success"><span class="badge-dot"></span>Hoạt động</span>' : '<span class="badge badge-critical"><span class="badge-dot"></span>Khóa</span>'}</td>
           <td style="font-size: 0.82rem; color: var(--text-muted);">${permDesc}</td>
         </tr>
       `;
@@ -876,7 +968,10 @@ window.runAIEvaluation = async function () {
 
   const runBtn = document.getElementById('btn-run-ai');
   runBtn.disabled = true;
-  runBtn.textContent = '⏳ Đang phân tích...';
+  runBtn.innerHTML = `
+    <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/><line x1="4.93" x2="7.76" y1="4.93" y2="7.76"/><line x1="16.24" x2="19.07" y1="16.24" y2="19.07"/><line x1="2" x2="6" y1="12" y2="12"/><line x1="18" x2="22" y1="12" y2="12"/></svg>
+    <span>Đang phân tích AI...</span>
+  `;
 
   try {
     const dailySales = parseFloat(document.getElementById('ai-input-sales').value) || 2.5;
@@ -898,17 +993,20 @@ window.runAIEvaluation = async function () {
 
     document.getElementById('ai-res-rate').textContent = `-${res.suggested_discount_rate}%`;
     document.getElementById('ai-res-price').textContent = formatCurrency(res.suggested_price);
-    document.getElementById('ai-res-engine').textContent = res.engine_used === 'openai_gpt' ? 'OpenAI GPT-4' : 'Rule-Based Fallback Engine';
+    document.getElementById('ai-res-engine').textContent = res.engine_used === 'openai_gpt' ? 'OpenAI GPT-4' : 'Rule-Based Engine';
     document.getElementById('ai-res-urgency').textContent = res.urgency_level.toUpperCase();
     document.getElementById('ai-res-reason').textContent = res.reasoning;
-    document.getElementById('ai-res-confidence').textContent = `${Math.round(res.confidence_score * 100)}%`;
+    document.getElementById('ai-res-confidence').textContent = `Độ tin cậy: ${Math.round(res.confidence_score * 100)}%`;
 
     showToast('AI đã hoàn tất đề xuất và ghi nhận vào danh sách Chờ duyệt!');
   } catch (err) {
     showToast('Lỗi chạy AI: ' + err.message, 'danger');
   } finally {
     runBtn.disabled = false;
-    runBtn.textContent = '🤖 Chạy Phân Tích AI';
+    runBtn.innerHTML = `
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+      <span>Chạy Phân Tích AI</span>
+    `;
   }
 };
 
@@ -931,7 +1029,7 @@ window.applyLatestAIDiscount = async function () {
 window.quickApplyAI = async function (batchId) {
   try {
     const res = await API.applyAIDiscount(batchId, 'v1');
-    showToast(`⚡ Đã tự động áp dụng giảm giá -${res.suggested_discount_rate}% cho lô hàng!`);
+    showToast(`Đã tự động áp dụng giảm giá -${res.suggested_discount_rate}% cho lô hàng!`);
     loadExpiringView();
   } catch (err) {
     showToast('Lỗi áp dụng AI nhanh: ' + err.message, 'danger');
@@ -1017,10 +1115,20 @@ window.handleAddProduct = async function (e) {
 
 // Initial setup
 document.addEventListener('DOMContentLoaded', async () => {
+  window.initTheme();
   await window.initAuth();
 
   const posForm = document.getElementById('pos-form');
   if (posForm) posForm.addEventListener('submit', window.handleCreateOrder);
+
+  const posProd = document.getElementById('pos-product');
+  if (posProd) posProd.addEventListener('change', window.updatePOSPreview);
+
+  const posQty = document.getElementById('pos-quantity');
+  if (posQty) posQty.addEventListener('input', window.updatePOSPreview);
+
+  const posMethod = document.getElementById('pos-payment-method');
+  if (posMethod) posMethod.addEventListener('change', window.updatePOSPreview);
 
   const addBatchForm = document.getElementById('add-batch-form');
   if (addBatchForm) addBatchForm.addEventListener('submit', window.handleAddBatch);
